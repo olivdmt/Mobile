@@ -1,21 +1,6 @@
 import 'package:catalogo_pessoal/data/status_item.dart';
 import 'package:catalogo_pessoal/models/Item_catalogo.dart';
 
-// const item = ItemCatalogo(
-//   id: 'livro-001',
-//   titulo: 'Clean Code',
-//   descricao: 'Praticas para codigo legivel',
-//   status: StatusItem.emAndamento,
-//   favorito: true,
-// );
-
-//   final itens = <ItemCatalogo>[item, outroItem];
-
-//   final favoritos = itens
-//       .where((item) => item.favorito)
-//       .toList(growable: false);
-
-//   final titulos = itens.where((item) => item.titulo).toList(growable: false);
 
 void main() {
 
