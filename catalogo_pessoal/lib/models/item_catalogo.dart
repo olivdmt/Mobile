@@ -22,4 +22,18 @@ class ItemCatalogo {
 
   bool get tituloValido => titulo.trim().length >= 2;
 
+  ItemCatalogo copyWith({
+    String? titulo,
+    String? descricao,
+    StatusItem? status,
+    bool? favorito,
+  }) {
+    return ItemCatalogo(
+      id: id,
+      titulo: titulo ?? this.titulo,
+      descricao: descricao ?? this.descricao,
+      status: status ?? this.status,
+      favorito: favorito ?? this.favorito,
+    );
+  }
 }

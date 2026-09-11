@@ -1,5 +1,1 @@
-enum StatusItem {
-  queroConhecer,
-  emAndamento,
-  concluido,
-}
+enum StatusItem { queroConhecer, emAndamento, concluido }

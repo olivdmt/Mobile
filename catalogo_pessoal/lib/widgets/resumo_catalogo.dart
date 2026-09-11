@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ResumoCatalogo extends StatelessWidget {
-  const ResumoCatalogo({super.key});
+  final int totalItens;
+  final int totalFavoritos;
+
+  const ResumoCatalogo({
+    required this.totalItens,
+    required this.totalFavoritos,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +23,17 @@ class ResumoCatalogo extends StatelessWidget {
               'Resumo do Catálogo',
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
+            Text(
+              'Itens: $totalItens',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Favoritos: $totalFavoritos',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const Divider(height: 32),
             Text(
               'Painel lateral exibido em telas amplas para informações adicionais e detalhes rápidos.',
               style: Theme.of(context).textTheme.bodyMedium,

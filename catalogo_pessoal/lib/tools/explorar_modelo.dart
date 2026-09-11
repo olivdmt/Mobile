@@ -1,9 +1,8 @@
+// ignore_for_file: avoid_print
 import 'package:catalogo_pessoal/data/status_item.dart';
-import 'package:catalogo_pessoal/models/Item_catalogo.dart';
-
+import 'package:catalogo_pessoal/models/item_catalogo.dart';
 
 void main() {
-
   final item = ItemCatalogo(
     id: '1',
     titulo: 'Clean Code',
@@ -12,7 +11,7 @@ void main() {
     favorito: true,
   );
 
-    final outroItem = ItemCatalogo(
+  final outroItem = ItemCatalogo(
     id: '2',
     titulo: 'Dart em pratica',
     descricao: 'Praticas para codigo legivel',
