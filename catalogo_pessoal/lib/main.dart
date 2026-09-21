@@ -1,4 +1,5 @@
-import 'package:catalogo_pessoal/home_screen.dart';
+import 'package:catalogo_pessoal/screens/lista_page.dart';
+import 'package:catalogo_pessoal/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,11 +12,10 @@ class CatalogoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
+      title: 'Catálogo Pessoal',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      home: const ListaPage(),
     );
   }
 }

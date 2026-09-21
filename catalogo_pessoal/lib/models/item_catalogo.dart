@@ -4,36 +4,66 @@ class ItemCatalogo {
   final String id;
   final String titulo;
   final String? descricao;
+  final String? categoria;
   final StatusItem status;
   final bool favorito;
 
   const ItemCatalogo({
     required this.id,
     required this.titulo,
-    required this.status,
     this.descricao,
+    this.categoria,
+    this.status = StatusItem.queroConhecer,
     this.favorito = false,
   });
 
   String get descricaoExibicao {
     final texto = descricao?.trim();
-    return texto == null || texto.isEmpty ? 'Sem descricao' : texto;
+    return texto == null || texto.isEmpty ? 'Sem descrição' : texto;
   }
 
-  bool get tituloValido => titulo.trim().length >= 2;
+  String get categoriaExibicao {
+    final texto = categoria?.trim();
+    return texto == null || texto.isEmpty ? 'Geral' : texto;
+  }
+
+  bool get tituloValido => titulo.trim().length >= 3;
 
   ItemCatalogo copyWith({
+    String? id,
     String? titulo,
     String? descricao,
+    String? categoria,
     StatusItem? status,
     bool? favorito,
   }) {
     return ItemCatalogo(
-      id: id,
+      id: id ?? this.id,
       titulo: titulo ?? this.titulo,
       descricao: descricao ?? this.descricao,
+      categoria: categoria ?? this.categoria,
       status: status ?? this.status,
       favorito: favorito ?? this.favorito,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ItemCatalogo &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          titulo == other.titulo &&
+          descricao == other.descricao &&
+          categoria == other.categoria &&
+          status == other.status &&
+          favorito == other.favorito;
+
+  @override
+  int get hashCode =>
+      Object.hash(id, titulo, descricao, categoria, status, favorito);
+
+  @override
+  String toString() =>
+      'ItemCatalogo(id: $id, titulo: $titulo, categoria: $categoria, status: ${status.name}, favorito: $favorito)';
 }

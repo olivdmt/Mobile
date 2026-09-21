@@ -4,71 +4,152 @@ import 'package:flutter/material.dart';
 
 class ItemCard extends StatelessWidget {
   final ItemCatalogo item;
-  final ValueChanged<String> onAlternarFavorito;
+  final ValueChanged<String>? onAlternarFavorito;
   final ValueChanged<String>? onRemover;
   final void Function(String id, StatusItem status)? onMudarStatus;
+  final VoidCallback? onTap;
 
   const ItemCard({
     required this.item,
-    required this.onAlternarFavorito,
+    this.onAlternarFavorito,
     this.onRemover,
     this.onMudarStatus,
+    this.onTap,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Card(
-      child: ListTile(
-        leading: IconButton(
-          tooltip: item.favorito ? 'Remover favorito' : 'Favoritar',
-          icon: Icon(
-            item.favorito ? Icons.favorite : Icons.favorite_border,
-            color: item.favorito ? Theme.of(context).colorScheme.primary : null,
-          ),
-          onPressed: () => onAlternarFavorito(item.id),
-        ),
-        title: Text(
-          item.titulo,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              item.descricaoExibicao,
-              style: Theme.of(context).textTheme.bodyMedium,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Status: ${item.status.name}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (onMudarStatus != null)
-              PopupMenuButton<StatusItem>(
-                tooltip: 'Alterar status',
-                icon: const Icon(Icons.more_vert),
-                onSelected: (novoStatus) => onMudarStatus!(item.id, novoStatus),
-                itemBuilder: (context) => [
-                  for (final status in StatusItem.values)
-                    PopupMenuItem(value: status, child: Text(status.name)),
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconButton(
+                tooltip: item.favorito
+                    ? 'Remover dos favoritos'
+                    : 'Marcar como favorito',
+                icon: Icon(
+                  item.favorito
+                      ? Icons.star_rounded
+                      : Icons.star_border_rounded,
+                  color: item.favorito
+                      ? Colors.amber[700]
+                      : colorScheme.outline,
+                  size: 28,
+                ),
+                onPressed: onAlternarFavorito != null
+                    ? () => onAlternarFavorito!(item.id)
+                    : null,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      item.titulo,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      item.descricaoExibicao,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        Chip(
+                          avatar: Icon(
+                            item.status.icone,
+                            size: 16,
+                            color: colorScheme.primary,
+                          ),
+                          label: Text(
+                            item.status.rotulo,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        if (item.categoria != null &&
+                            item.categoria!.trim().isNotEmpty)
+                          Chip(
+                            avatar: const Icon(Icons.label_outline, size: 16),
+                            label: Text(
+                              item.categoriaExibicao,
+                              style: theme.textTheme.labelSmall,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (onMudarStatus != null)
+                    PopupMenuButton<StatusItem>(
+                      tooltip: 'Alterar status',
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (novoStatus) =>
+                          onMudarStatus!(item.id, novoStatus),
+                      itemBuilder: (context) => [
+                        for (final status in StatusItem.values)
+                          PopupMenuItem(
+                            value: status,
+                            child: Row(
+                              children: [
+                                Icon(status.icone, size: 18),
+                                const SizedBox(width: 8),
+                                Text(status.rotulo),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  if (onRemover != null)
+                    IconButton(
+                      tooltip: 'Remover item',
+                      icon: Icon(
+                        Icons.delete_outline,
+                        color: colorScheme.error,
+                      ),
+                      onPressed: () => onRemover!(item.id),
+                    ),
                 ],
               ),
-            if (onRemover != null)
-              IconButton(
-                tooltip: 'Remover item',
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () => onRemover!(item.id),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
