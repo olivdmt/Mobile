@@ -82,6 +82,48 @@ test/
    ```
    *O artefato gerado estará em: `build/app/outputs/flutter-apk/app-release.apk`*
 
+## 🔐 Autenticação Firebase (Unidade 5)
+
+O app inicia no `AuthGate`: primeiro observa a sessão persistida, depois mostra o
+formulário de entrada/cadastro ou o catálogo. O fluxo inclui logout, envio e
+atualização da verificação de e-mail e recuperação de senha. O SDK fica no
+Service, o Repository traduz falhas, e os ViewModels publicam o estado para as
+telas.
+
+Para configurar um ambiente de desenvolvimento:
+
+1. Instale Firebase CLI e FlutterFire CLI (`npm install -g firebase-tools`,
+   `firebase login` e `dart pub global activate flutterfire_cli`). Rode
+   `flutterfire configure` e selecione o projeto de desenvolvimento. O comando
+   substituirá o arquivo provisório `lib/firebase_options.dart`.
+2. No Firebase Console desse projeto, habilite **Authentication → Email/Password**.
+3. Para executar o Auth Emulator e o Firestore Emulator com o mesmo ID do
+   projeto configurado no FlutterFire, rode
+   `firebase emulators:start --project ID_DO_PROJETO --only auth,firestore`.
+4. Em outro terminal, inicie o Android Emulator com:
+   `flutter run --dart-define=USE_FIREBASE_EMULATORS=true`
+
+O host dos emuladores usa `10.0.2.2` no Android Emulator e `127.0.0.1` em
+desktop/web. Para um dispositivo físico, informe o IP da máquina com
+`--dart-define=FIREBASE_EMULATOR_HOST=IP_DA_MAQUINA`. O app não contém
+credenciais de serviço nem define um projeto Firebase real; não configure este
+fluxo apontando para produção.
+
+### Firestore de tarefas (Unidade 6)
+
+O botão **Minhas tarefas** abre a lista privada da sessão. O Firestore recebe
+apenas consultas limitadas e filtradas pelo UID, e `firestore.rules` valida dono,
+campos, tipos e imutabilidade de `ownerId`/`createdAt`. O índice composto fica em
+`firestore.indexes.json`; `firebase.json` aponta os emuladores para as regras
+versionadas no repositório.
+
+Para testar as regras localmente, instale as dependências JavaScript com
+`npm install` e rode `npm run test:rules`. O script inicia um Firestore Emulator
+isolado com o projeto fictício `demo-catalogo-pessoal`; os casos cobrem uma
+operação permitida pelo dono e negações para outra pessoa, sessão anônima e dados
+inválidos. Para testar o app, use o ID real do projeto de desenvolvimento gerado
+por FlutterFire nos comandos de emulador, mantendo-o igual para Auth e Firestore.
+
 ---
 
 ## 📋 Matriz dos 13 Critérios da Rubrica

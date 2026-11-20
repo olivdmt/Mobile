@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsExisting() {
+      return signedIn()
+        && resource.data.ownerId == request.auth.uid;
+    }
+
+    function ownsIncoming() {
+      return signedIn()
+        && request.resource.data.ownerId == request.auth.uid;
+    }
+
+    function validFields() {
+      return request.resource.data.keys().hasAll([
+          'titulo', 'concluida', 'ownerId', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'titulo', 'concluida', 'ownerId', 'createdAt', 'updatedAt'
+        ]);
+    }
+
+    function validTypes() {
+      return request.resource.data.titulo is string
+        && request.resource.data.titulo.size() > 0
+        && request.resource.data.titulo.size() <= 120
+        && request.resource.data.concluida is bool
+        && request.resource.data.ownerId is string
+        && request.resource.data.ownerId.size() > 0
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+    }
+
+    match /tarefas/{tarefaId} {
+      allow create: if ownsIncoming() && validFields() && validTypes();
+      allow get, list: if ownsExisting();
+      allow update: if ownsExisting()
+        && ownsIncoming()
+        && validFields()
+        && validTypes()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['titulo', 'concluida', 'updatedAt']);
+      allow delete: if ownsExisting();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

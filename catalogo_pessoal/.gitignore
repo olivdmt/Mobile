@@ -30,6 +30,7 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
+node_modules/
 /build/
 /coverage/
 
@@ -46,3 +47,4 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+RELATORIO.md

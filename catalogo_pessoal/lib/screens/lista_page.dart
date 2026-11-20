@@ -9,8 +9,15 @@ import 'package:flutter/material.dart';
 
 class ListaPage extends StatefulWidget {
   final List<ItemCatalogo>? itens;
+  final String? accountEmail;
+  final List<Widget> accountActions;
 
-  const ListaPage({this.itens, super.key});
+  const ListaPage({
+    this.itens,
+    this.accountEmail,
+    this.accountActions = const [],
+    super.key,
+  });
 
   @override
   State<ListaPage> createState() => _ListaPageState();
@@ -100,8 +107,22 @@ class _ListaPageState extends State<ListaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Catálogo Pessoal'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Catálogo Pessoal'),
+            if (widget.accountEmail case final email?)
+              Text(
+                email,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+          ],
+        ),
         actions: [
+          ...widget.accountActions,
           IconButton(
             tooltip: 'Criar novo item',
             icon: const Icon(Icons.add_circle_outline),
