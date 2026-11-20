@@ -33,6 +33,9 @@ migrate_working_dir/
 node_modules/
 /build/
 /android/build/
+/android/key.properties
+/android/app/*.jks
+/android/app/*.keystore
 /tmp/pdfs/
 /coverage/
 

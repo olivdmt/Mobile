@@ -5,7 +5,7 @@ Aplicativo Flutter para leitores organizarem livros e outras referências. A con
 ## Requisitos
 
 - Flutter/Dart compatível com `pubspec.yaml` (`flutter --version`)
-- JDK compatível com Gradle 8.13 (JDK 17–24; JDK 21 recomendado)
+- JDK 17 ou superior (JDK 21 recomendado)
 - Node.js e Firebase CLI para os testes/deploy de regras
 - Projeto Firebase de desenvolvimento com Email/Senha habilitado e Cloud Firestore criado
 
@@ -40,11 +40,10 @@ npm ci
 npm run test:rules
 ```
 
-O fluxo instrumentado cobre cadastro, criação, edição e exclusão no emulador:
+O fluxo instrumentado cobre cadastro, criação, edição e exclusão no emulador. HTTP claro fica habilitado somente no manifest debug para alcançar os emuladores locais; o manifest release não permite essa configuração.
 
 ```sh
-firebase emulators:start --project demo-catalogo-pessoal --only auth,firestore
-flutter test integration_test/catalog_crud_flow_test.dart --dart-define=USE_FIREBASE_EMULATORS=true
+firebase emulators:exec --project demo-catalogo-pessoal --only auth,firestore "flutter test integration_test/catalog_crud_flow_test.dart -d emulator-5554 --dart-define=USE_FIREBASE_EMULATORS=true"
 ```
 
 `test/` contém testes unitários, de widget e das regras. Os testes de integração exigem dispositivo/emulador Android conectado e os emuladores Firebase ativos.
@@ -56,8 +55,8 @@ flutter build apk --release
 flutter build appbundle --release
 ```
 
-Sem configuração, os builds usam a chave debug e servem apenas para instalação local. Para gerar distribuição assinada, defina `ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` e `ANDROID_KEY_PASSWORD` no ambiente antes do build. Gere uma chave própria com `keytool`, guarde-a fora do repositório e nunca publique as senhas. Artefatos esperados: `build/app/outputs/flutter-apk/app-release.apk` e `build/app/outputs/bundle/release/app-release.aab`. Instale e valide o APK, registre SHA-256, commit e tag exatos.
+Sem configuração, os builds usam a chave debug e servem apenas para instalação local. Para distribuição assinada, gere uma chave própria com `keytool`, mantenha `upload-keystore.jks` e `key.properties` fora do Git e preencha `android/key.properties` (ou defina `ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` e `ANDROID_KEY_PASSWORD`). Nunca publique as senhas. Artefatos esperados: `build/app/outputs/flutter-apk/app-release.apk` e `build/app/outputs/bundle/release/app-release.aab`. O release desta versão foi assinado com chave de upload privada, verificado com `apksigner`/`jarsigner` e instalado no emulador. Os SHA-256 e a versão remota são registrados no relatório final.
 
 ## Rastreamento da entrega
 
-Versão do app: `1.0.0+1`. O PDF final deve informar repositório acessível, tag ou hash remoto, ambiente, evidências dos critérios, resultados de análise/testes e hashes dos artefatos. Esses dados devem ser preenchidos após publicar a versão avaliada; nenhum endereço remoto ou hash é presumido neste README.
+Versão do app: `1.0.0+1`. Repositório: [olivdmt/Mobile](https://github.com/olivdmt/Mobile), subdiretório `catalogo_pessoal/`. A versão tagueada e os hashes de release são informados no relatório final. As credenciais de assinatura ficam fora do Git.

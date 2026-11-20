@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -7,10 +9,20 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val releasePropertiesFile = rootProject.file("key.properties")
+val releaseProperties = Properties().apply {
+    if (releasePropertiesFile.exists()) {
+        releasePropertiesFile.inputStream().use { load(it) }
+    }
+}
 val releaseStorePath = System.getenv("ANDROID_KEYSTORE_PATH")
+    ?: releaseProperties.getProperty("storeFile")
 val releaseStorePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+    ?: releaseProperties.getProperty("storePassword")
 val releaseKeyAlias = System.getenv("ANDROID_KEY_ALIAS")
+    ?: releaseProperties.getProperty("keyAlias")
 val releaseKeyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+    ?: releaseProperties.getProperty("keyPassword")
 val hasReleaseSigning = listOf(
     releaseStorePath,
     releaseStorePassword,
@@ -21,7 +33,7 @@ val hasReleaseSigning = listOf(
 android {
     namespace = "com.example.catalogo_pessoal"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -45,7 +57,7 @@ android {
 
     if (hasReleaseSigning) {
         signingConfigs.create("release") {
-            storeFile = file(releaseStorePath!!)
+            storeFile = file(requireNotNull(releaseStorePath))
             storePassword = releaseStorePassword
             keyAlias = releaseKeyAlias
             keyPassword = releaseKeyPassword

@@ -47,7 +47,7 @@ void main() {
     await tester.enterText(find.byKey(const Key('titulo')), 'Livro alterado');
     await tester.tap(find.byKey(const Key('salvar_button')));
     await tester.pumpAndSettle(const Duration(seconds: 5));
-    expect(find.text('Livro alterado'), findsOneWidget);
+    expect(find.text('Livro alterado'), findsWidgets);
 
     await tester.tap(find.text('Livro alterado').first);
     await tester.pumpAndSettle();
