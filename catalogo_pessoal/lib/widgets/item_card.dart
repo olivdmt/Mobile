@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:catalogo_pessoal/data/status_item.dart';
 import 'package:catalogo_pessoal/models/item_catalogo.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,23 @@ class ItemCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (item.fotoLocalBase64?.isNotEmpty == true) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.memory(
+                    base64Decode(item.fotoLocalBase64!),
+                    width: 48,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const SizedBox(
+                      width: 48,
+                      height: 64,
+                      child: Icon(Icons.broken_image_outlined),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+              ],
               IconButton(
                 tooltip: item.favorito
                     ? 'Remover dos favoritos'

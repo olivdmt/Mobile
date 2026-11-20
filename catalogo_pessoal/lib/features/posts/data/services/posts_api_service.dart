@@ -28,9 +28,9 @@ class PostsApiService {
   final Duration timeout;
 
   PostsApiService({
-    required http.Client client,
+    required this._client,
     this.timeout = const Duration(seconds: 8),
-  }) : _client = client;
+  });
 
   Future<List<Post>> buscarPosts({int? userId}) async {
     final uri = Uri.https(

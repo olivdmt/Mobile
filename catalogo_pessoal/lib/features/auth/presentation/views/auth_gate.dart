@@ -5,16 +5,25 @@ import 'package:catalogo_pessoal/features/auth/presentation/view_models/auth_ses
 import 'package:catalogo_pessoal/features/auth/presentation/views/sign_in_screen.dart';
 import 'package:catalogo_pessoal/features/auth/presentation/views/signed_in_catalog_screen.dart';
 import 'package:catalogo_pessoal/features/tasks/data/repositories/task_repository.dart';
+import 'package:catalogo_pessoal/features/catalog/data/repositories/catalog_repository.dart';
+import 'package:catalogo_pessoal/features/catalog/data/services/catalog_photo_picker.dart';
+import 'package:catalogo_pessoal/features/books/data/open_library_book_repository.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({
     required this.repository,
     required this.taskRepository,
+    required this.catalogRepository,
+    required this.bookSearchRepository,
+    required this.photoPicker,
     super.key,
   });
 
   final AuthRepository repository;
   final TaskRepository taskRepository;
+  final CatalogRepository catalogRepository;
+  final BookSearchRepository bookSearchRepository;
+  final CatalogPhotoPicker photoPicker;
 
   @override
   State<AuthGate> createState() => _AuthGateState();
@@ -47,6 +56,9 @@ class _AuthGateState extends State<AuthGate> {
             : SignedInCatalogScreen(
                 repository: widget.repository,
                 taskRepository: widget.taskRepository,
+                catalogRepository: widget.catalogRepository,
+                bookSearchRepository: widget.bookSearchRepository,
+                photoPicker: widget.photoPicker,
                 user: _session.user!,
               ),
     },

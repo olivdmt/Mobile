@@ -56,7 +56,7 @@ class CatalogoGrade extends StatelessWidget {
             maxCrossAxisExtent: 440,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            mainAxisExtent: 200,
+            mainAxisExtent: 232,
           ),
           itemCount: itens.length,
           itemBuilder: (context, index) {

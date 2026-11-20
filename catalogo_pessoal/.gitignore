@@ -32,6 +32,8 @@ migrate_working_dir/
 .pub/
 node_modules/
 /build/
+/android/build/
+/tmp/pdfs/
 /coverage/
 
 # Symbolication related

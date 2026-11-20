@@ -1,164 +1,57 @@
-# Relatório do Trabalho Final
-## Desenvolvimento Mobile I — Catálogo Pessoal em Flutter
+# Relatório final — Mobile II
 
-**Estudante:** Mateus Dayson de Oliveira  
-**Matrícula:** 0031595  
-**Turma:** ADS – Turma de Quarta 2025/2026  
-**Aplicativo:** Catálogo Pessoal  
-**Semestre:** 2º Semestre / 2026  
+> Rascunho de trabalho, não é ainda o PDF de submissão. Preencher a versão remota (tag/hash), anexar capturas próprias e resultados finais de release antes de exportar. Não usar evidências de exemplo fictício.
 
----
+## 1. Identificação e produto
 
-## 1. Identificação e Resumo
+**Estudante:** Mateus Dayson de Oliveira
+**Matrícula:** 0031595
+**Turma:** ADS – Turma de Quarta 2025/2026
+**Aplicativo:** Catálogo Pessoal
+**Problema e público:** leitores e estudantes que precisam organizar livros e referências, acompanhar status e consultar os próprios registros por conta autenticada.
+**Fluxo:** cadastro/login → catálogo vazio/carregado/cache → cadastrar ou buscar livro → detalhe/edição/favorito/status → exclusão → logout.
 
-### Domínio e Problema
-O **Catálogo Pessoal** é uma aplicação desenvolvida em Flutter destinada a usuários e leitores que necessitam registrar, organizar e acompanhar o progresso de itens do seu acervo (livros, artigos e referências de estudo). O sistema resolve a desorganização de anotações dispersas, fornecendo uma interface intuitiva para cadastro, classificação por categorias, acompanhamento de status (*Quero Conhecer*, *Em Andamento*, *Concluído*) e destaque de itens favoritos.
+## 2. Repositório, versão e reprodução
 
-### Fluxo Principal
-O fluxo da aplicação se inicia na tela principal (`ListaPage`), onde a coleção de itens é exibida em uma grade/lista dinâmica. Ao tocar em um cartão (`ItemCard`), o usuário é direcionado à tela de visualização detalhada (`DetalhePage`). A partir do botão de ação flutuante (FAB) na lista ou do botão "Editar" no detalhe, a tela de formulário reutilizável (`FormularioPage`) é aberta. Ao submeter com dados válidos, o formulário retorna um objeto tipado `ItemCatalogo` à tela de origem via `Navigator.pop()`, atualizando o estado local em memória e apresentando uma confirmação visual via `SnackBar`.
+**Repositório configurado:** https://github.com/olivdmt/Mobile
+**Subdiretório:** `catalogo_pessoal/`
+**Tag ou hash remoto avaliado:** PENDENTE — publicar a revisão e anotar o identificador remoto exato.
+**Versão do app:** 1.0.0+1
+**Ambiente validado:** Flutter 3.47.0 / Dart 3.13.0; Node usado para suíte Firestore; emulador Firestore local.
+**Reprodução:** `flutter pub get`, `flutter run`; emuladores com `firebase emulators:start --project demo-catalogo-pessoal --only auth,firestore` e `flutter run --dart-define=USE_FIREBASE_EMULATORS=true`.
 
-### Escopo do M1
-No escopo do **M1**, foi implementado o fluxo completo em memória local com validações síncronas de formulário, prevenção contra múltiplos envios, layout adaptativo sem overflow para telas estreitas e amplas, acessibilidade básica e suíte de testes automatizados de unidade e widget. Recursos como autenticação de usuário, banco de dados remoto/local e sincronização em nuvem pertencem ao escopo futuro de **Mobile II**.
+## 3. Matriz de evidências
 
----
+| Nº | Critério | Implementação/evidência no projeto | Estado da evidência |
+|---:|---|---|---|
+| 1 | Produto, autoria, problema, público e fluxo | Esta seção e telas `lib/screens/` | Capturas próprias pendentes |
+| 2 | Repositório e versão reproduzível | URL acima; `pubspec.yaml`, `firebase.json`, README | Hash/tag remotos pendentes |
+| 3 | MVVM observável | `ListaPage` → `CatalogViewModel` → `CatalogRepository` → `FirestoreCatalogService` | Código presente |
+| 4 | Loading, sucesso, vazio, erro, recuperação | `CatalogStatus`, `ListaPage`, `retry()` | Teste VM presente; capturas pendentes |
+| 5 | Serviço externo e falhas | `OpenLibraryBookRepository`, VM de busca; fallback de preenchimento manual | Testes com resposta e HTTP 503 presentes |
+| 6 | Cache/offline | `SharedPreferencesCatalogCache`, dados por UID, banner cache; escrita requer conexão | Código presente; captura offline pendente |
+| 7 | Sessão e logout | Firebase Auth, `AuthGate`, `SignedInCatalogScreen`; logout remove cache privado | Testes de sessão existentes |
+| 8 | CRUD e vínculo UID | `itens_catalogo`, serviço/repositório; query e criação associados ao UID | Regras permitem CRUD dono; teste instrumentado preparado |
+| 9 | Segurança permitida/negada | `firestore.rules`; teste com dono, outro UID, anônimo, campos inválidos | `npm run test:rules` aprovado |
+| 10 | Recurso nativo | `image_picker`, câmera/galeria, recusa com alternativa; foto somente em cache local | Implementação presente; captura em Android pendente |
+| 11 | Unitários | `test/features/catalog_view_model_test.dart`, `open_library_book_repository_test.dart` | `flutter test`: 23 testes aprovados |
+| 12 | Widget e integração | `test/screens/`, `integration_test/catalog_crud_flow_test.dart` | Widget aprovado; fluxo instrumentado ainda não executado |
+| 13 | Análise e release | versão em `pubspec.yaml`, artefatos esperados no README | `flutter analyze` aprovado; builds bloqueados pela versão Java local; não atestar APK/AAB |
 
-## 2. Repositório, Versão e Execução
+## 4. Arquitetura, serviço e offline
 
-- **Repositório:** `https://github.com/olivdmt/Mobile.git` (subpasta `catalogo_pessoal`)
-- **Tag / Commit Hash:** `m1-entrega`
-- **Ambiente:** Flutter 3.47.0 • Dart 3.13.0 • Material 3
-- **Artefato Android Gerado:** `build/app/outputs/flutter-apk/app-release.apk` (47.5 MB)
+A View desenha catálogo e formulários. `CatalogViewModel` controla estados, erros, UID e comandos. `CatalogRepository` é o ponto de orquestração entre cache e Firestore; `FirestoreCatalogService` converte documentos. A busca externa usa Open Library com consulta limitada a seis resultados, timeout e tratamento de erros. O cache local recupera o catálogo antes da conexão remota, identificando sua origem e data. O app permite leitura do último cache offline e informa que alterações precisam de conexão; não implementa fila de sincronização de escrita.
 
-### Como Reproduzir
-1. Clonar o repositório Git e acessar a pasta do projeto:
-   ```bash
-   git clone https://github.com/olivdmt/Mobile.git
-   cd Mobile/catalogo_pessoal
-   ```
-2. Obter as dependências:
-   ```bash
-   flutter pub get
-   ```
-3. Executar os testes automatizados:
-   ```bash
-   flutter test
-   ```
-4. Executar a análise estática:
-   ```bash
-   flutter analyze
-   ```
-5. Executar o aplicativo no emulador ou dispositivo conectado:
-   ```bash
-   flutter run
-   ```
-6. Gerar o APK de Release para Android:
-   ```bash
-   flutter build apk
-   ```
+## 5. Autenticação, CRUD e regras
 
-*O projeto opera de forma autônoma sem requerer credenciais externas ou chaves de API nesta etapa.*
+Firebase Authentication usa e-mail/senha e mantém a sessão. As telas autenticadas são construídas pelo `AuthGate`. Cada item tem `ownerId`, e consultas filtram pelo UID corrente. `firestore.rules` valida campos, tamanhos e tipos; impede troca do proprietário e nega leitura/escrita de outras contas. O teste de regras comprova operações do dono e nega as tentativas de terceiros, anônimos e payloads inválidos.
 
----
+## 6. Recurso nativo, privacidade e testes
 
-## 3. Matriz de Requisitos (13 Critérios da Rubrica)
+A câmera e galeria usam `image_picker`. Se a permissão da câmera for negada, o fluxo oferece a galeria ou continuação sem foto. A foto é redimensionada e guardada no cache local segmentado por UID; não é enviada ao Firestore e o cache é removido no logout. Testes unitários cobrem transições do catálogo, falha/repetição, UID e conversão/resposta externa. Testes widget existentes cobrem telas e formulário. O teste instrumentado cobre cadastro, criação, edição e exclusão via emuladores e precisa ser executado em dispositivo/emulador antes da entrega.
 
-| Nº | Requisito da Rubrica | Evidência no Documento | Arquivo / Classe no Projeto |
-|---|---|---|---|
-| **1** | Identificação, objetivo e fluxo | Seção 1 deste relatório | `RELATORIO.md` e `README.md` |
-| **2** | Repositório, versão e instruções | Seção 2 deste relatório | `README.md` |
-| **3** | Execução e artefato Android | Seção 5 (Saída de build) | `build/app/outputs/flutter-apk/app-release.apk` |
-| **4** | Duas ou mais telas e navegação | Evidência B e Seção 5 | `lib/screens/lista_page.dart`, `detalhe_page.dart` |
-| **5** | Coleção dinâmica e estado vazio | Evidência A | `lib/widgets/estado_vazio.dart`, `lib/screens/lista_page.dart` |
-| **6** | Detalhe do item selecionado | Evidência B | `lib/screens/detalhe_page.dart` |
-| **7** | Formulário e validação | Evidência C | `lib/screens/formulario_page.dart` |
-| **8** | Criação e edição no estado local | Evidência D | `lib/screens/formulario_page.dart`, `lista_page.dart` |
-| **9** | Modelo e widgets organizados | Seção 5 (Estrutura) | `lib/models/`, `lib/widgets/`, `lib/screens/`, `lib/theme/` |
-| **10** | Dois espaços sem overflow | Evidência E | `lib/screens/lista_page.dart`, `lib/widgets/resumo_catalogo.dart` |
-| **11** | Tema e acessibilidade | Evidência B e E, Seção 4 | `lib/theme/app_theme.dart` |
-| **12** | Análise e teste de widget | Seção 5 (Testes e Análise) | `test/` (15 testes passando), `flutter analyze` limpo |
-| **13** | Decisões, fontes e autoria | Seção 6 deste relatório | `RELATORIO.md` |
+## 7. Análise, versão, assinatura e fontes
 
----
+Análise local executada: `flutter analyze` sem issues. Testes: `flutter test` aprovado; `npm run test:rules` aprovado. Regras/índices publicados no projeto `catalogopessoal-54703`. Versão: 1.0.0+1. Ainda faltam execução do teste instrumentado, APK/AAB atualizados, instalação do APK, chave de release própria, hashes, tag/hash remoto e capturas legíveis. O JDK instalado nesta máquina é 25; Gradle 8.13 requer JDK compatível e o build foi impedido pelo ambiente. O keystore não deve ser compartilhado ou versionado.
 
-## 4. Evidências Visuais e Funcionais
-
-### Evidência A — Estado Vazio e Coleção
-- **Estado Vazio:** Quando a coleção de itens está vazia (`_itens.isEmpty`), o componente reutilizável `EstadoVazio` é exibido centralizado com ícone ilustrativo, texto descritivo e o botão `"Adicionar primeiro item"`.
-- **Coleção Dinâmica:** Ao adicionar itens, a tela transiciona reativamente para a exibição da lista de cartões (`ItemCard`), exibindo título, descrição, categoria, status e indicador de favorito.
-
-### Evidência B — Navegação e Detalhe
-- Ao clicar em qualquer cartão na `ListaPage`, ocorre o disparo de `Navigator.push` para a `DetalhePage`.
-- A tela de detalhe recebe a instância de `ItemCatalogo` e renderiza todas as informações completas, botões de ação para alternar favorito em tempo real, editar (abrindo o formulário pré-preenchido) e excluir com diálogo de confirmação modal (`AlertDialog`).
-
-### Evidência C — Formulário e Validação
-- O formulário utiliza `GlobalKey<FormState>`, validadores declarativos (`_validarTitulo` e `_validarCategoria`) com regras de preenchimento (campo não-vazio e no mínimo 3 caracteres).
-- Caso o usuário tente salvar com campos inválidos, as mensagens de erro `"Informe o título"` e `"Use pelo menos 3 caracteres"` surgem imediatamente sob os respectivos campos (`AutovalidateMode.onUserInteraction`) e o envio é bloqueado.
-
-### Evidência D — Criação e Edição
-- **Criação:** Abrir o formulário sem item inicial (`itemInicial == null`) inicializa os campos vazios. Ao salvar, um novo `id` é gerado, o item é adicionado à lista e um `SnackBar("Item salvo.")` é exibido.
-- **Edição:** Ao abrir a partir de um item existente, os `TextEditingController` são inicializados no `initState` com os dados atuais. Ao salvar, a lista local localiza o item pelo `id` através de `indexWhere` e o substitui sem duplicá-lo.
-
-### Evidência E — Dois Espaços de Tela (Responsividade sem Overflow)
-- Utilização de `LayoutBuilder` na `ListaPage` e `SingleChildScrollView` nas telas de detalhe e formulário.
-- **Espaço Estreito (< 900px):** Apresenta a lista/grade em coluna única com proporção ajustada, aproveitando a área vertical e acomodando o teclado virtual sem erro de RenderFlex.
-- **Espaço Amplo ($\ge$ 900px):** Divide o layout horizontalmente em grade de cartões expandida e painel lateral `ResumoCatalogo` com métricas consolidadas (Total de itens, Favoritos, Em andamento, Concluídos).
-
-### Acessibilidade
-- Tema Material 3 com contraste estrito entre texto e plano de fundo (`AppTheme.lightTheme`).
-- Todos os `IconButton` possuem `tooltip` semântico explícito (`"Favoritar"`, `"Remover dos favoritos"`, `"Editar item"`, `"Excluir item"`).
-- Alvos de toque adequados com altura e largura mínimas $\ge 48\text{dp}$.
-- Ordem lógica de foco do teclado virtual configurada via `FocusNode` e `textInputAction` (`next` e `done`).
-
----
-
-## 5. Organização e Qualidade
-
-### Estrutura do Código
-```
-lib/
-├── data/ (dados iniciais e enums)
-├── models/ (modelo de domínio imutável com copyWith e validações)
-├── screens/ (telas do fluxo: lista, detalhe e formulário)
-├── theme/ (definições de tema e acessibilidade visual)
-└── widgets/ (componentes modulares e reutilizáveis)
-```
-
-### Decisão de Componentização
-O componente `ItemCard` foi extraído para isolar a responsabilidade de apresentação e interação imediata de cada obra (favoritar, alterar status, clique para detalhe). O componente `EstadoVazio` foi desacoplado para permitir reaproveitamento em estados de busca e coleções vazias, enquanto `ResumoCatalogo` encapsula o cálculo e apresentação das estatísticas em telas amplas.
-
-### Análise Estática, Testes e Build
-
-```text
-$ dart format .
-Formatted 21 files in 0.19 seconds.
-
-$ flutter analyze
-Analyzing catalogo_pessoal...
-No issues found! (ran in 3.4s)
-
-$ flutter test
-00:04 +15: All tests passed!
-
-$ flutter build apk
-√ Built build\app\outputs\flutter-apk\app-release.apk (47.5MB)
-```
-
----
-
-## 6. Decisões, Dificuldade, Fontes e Autoria
-
-### Decisões Técnicas
-1. **Formulário Unificado:** Utilização de uma única classe `FormularioPage` tanto para cadastro quanto para edição, controlando o modo através da nulabilidade do parâmetro `itemInicial`. Isso evita código duplicado e garante consistência das regras de validação.
-2. **Imutabilidade e Identidade Estável:** A classe `ItemCatalogo` utiliza propriedades finais e método `copyWith`. Na atualização do estado, a identificação é feita por `id` imutável, garantindo que mesmo itens com títulos idênticos não sofram conflitos.
-3. **Proteção contra Duplo Envio:** Implementação de guarda síncrona `_submetendo` no envio do formulário, desabilitando o botão de submissão e prevenindo submissões duplicadas.
-
-### Dificuldade Enfrentada e Solução
-Durante os testes de responsividade em diferentes larguras de viewport, o painel lateral `ResumoCatalogo` gerava overflow horizontal de texto quando renderizado em tamanhos intermediários. A solução consistiu em envolver os títulos em `Expanded` com `TextOverflow.ellipsis`, aplicar `SingleChildScrollView` e calibrar o breakpoint responsivo no `LayoutBuilder` para 900px.
-
-### Fontes Consultadas
-- Documentação Oficial do Flutter: *Form Validation, Layouts, Testing & Accessibility* ([docs.flutter.dev](https://docs.flutter.dev))
-- Documentação da Linguagem Dart: *Null safety, Collections & Immutability* ([dart.dev](https://dart.dev))
-- Conjunto de Ícones Material Design 3
-
-### Declaração de Autoria
-Declaro que este trabalho e relatório descrevem fielmente a versão identificada do aplicativo **Catálogo Pessoal**, que as fontes e bibliotecas externas foram devidamente registradas e que o código não contém segredos, tokens ou senhas publicadas.
+**Fontes técnicas:** documentação da [API Search da Open Library](https://openlibrary.org/dev/docs/api/search), [image_picker](https://pub.dev/packages/image_picker), [shared_preferences](https://pub.dev/packages/shared_preferences), [Flutter: migração Android Gradle Plugin](https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin) e [regras do Firestore](https://firebase.google.com/docs/firestore/security/get-started).

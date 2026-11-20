@@ -3,6 +3,11 @@ import 'package:catalogo_pessoal/features/auth/data/services/firebase_auth_servi
 import 'package:catalogo_pessoal/features/auth/presentation/views/auth_gate.dart';
 import 'package:catalogo_pessoal/features/tasks/data/repositories/task_repository.dart';
 import 'package:catalogo_pessoal/features/tasks/data/services/firestore_task_service.dart';
+import 'package:catalogo_pessoal/features/catalog/data/repositories/catalog_repository.dart';
+import 'package:catalogo_pessoal/features/catalog/data/services/firestore_catalog_service.dart';
+import 'package:catalogo_pessoal/features/catalog/data/services/local_catalog_cache.dart';
+import 'package:catalogo_pessoal/features/catalog/data/services/catalog_photo_picker.dart';
+import 'package:catalogo_pessoal/features/books/data/open_library_book_repository.dart';
 import 'package:catalogo_pessoal/firebase_options.dart';
 import 'package:catalogo_pessoal/theme/app_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +15,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const _useFirebaseEmulators = bool.fromEnvironment(
   'USE_FIREBASE_EMULATORS',
@@ -45,8 +51,18 @@ Future<void> main() async {
       FirestoreTaskService(FirebaseFirestore.instance),
       repository,
     );
+    final catalogRepository = FirestoreCatalogRepository(
+      FirestoreCatalogService(FirebaseFirestore.instance),
+      SharedPreferencesCatalogCache(SharedPreferencesAsync()),
+    );
     runApp(
-      CatalogoApp(authRepository: repository, taskRepository: taskRepository),
+      CatalogoApp(
+        authRepository: repository,
+        taskRepository: taskRepository,
+        catalogRepository: catalogRepository,
+        bookSearchRepository: OpenLibraryBookRepository(),
+        photoPicker: ImagePickerCatalogPhotoPicker(),
+      ),
     );
   } catch (error, stackTrace) {
     debugPrint('Firebase initialization failed: $error');
@@ -59,12 +75,18 @@ class CatalogoApp extends StatelessWidget {
   const CatalogoApp({
     this.authRepository,
     this.taskRepository,
+    this.catalogRepository,
+    this.bookSearchRepository,
+    this.photoPicker,
     this.configurationNeeded = false,
     super.key,
   });
 
   final AuthRepository? authRepository;
   final TaskRepository? taskRepository;
+  final CatalogRepository? catalogRepository;
+  final BookSearchRepository? bookSearchRepository;
+  final CatalogPhotoPicker? photoPicker;
   final bool configurationNeeded;
 
   @override
@@ -72,8 +94,17 @@ class CatalogoApp extends StatelessWidget {
     title: 'Catálogo Pessoal',
     debugShowCheckedModeBanner: false,
     theme: AppTheme.lightTheme,
-    home: authRepository != null && taskRepository != null
-        ? AuthGate(repository: authRepository!, taskRepository: taskRepository!)
+    home:
+        authRepository != null &&
+            taskRepository != null &&
+            catalogRepository != null
+        ? AuthGate(
+            repository: authRepository!,
+            taskRepository: taskRepository!,
+            catalogRepository: catalogRepository!,
+            bookSearchRepository: bookSearchRepository!,
+            photoPicker: photoPicker!,
+          )
         : configurationNeeded
         ? const FirebaseSetupScreen()
         : const Scaffold(body: Center(child: CircularProgressIndicator())),

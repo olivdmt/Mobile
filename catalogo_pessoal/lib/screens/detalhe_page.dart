@@ -1,11 +1,22 @@
+import 'dart:convert';
+
+import 'package:catalogo_pessoal/features/books/data/open_library_book_repository.dart';
+import 'package:catalogo_pessoal/features/catalog/data/services/catalog_photo_picker.dart';
 import 'package:catalogo_pessoal/models/item_catalogo.dart';
 import 'package:catalogo_pessoal/screens/formulario_page.dart';
 import 'package:flutter/material.dart';
 
 class DetalhePage extends StatefulWidget {
   final ItemCatalogo item;
+  final BookSearchRepository? bookSearchRepository;
+  final CatalogPhotoPicker? photoPicker;
 
-  const DetalhePage({required this.item, super.key});
+  const DetalhePage({
+    required this.item,
+    this.bookSearchRepository,
+    this.photoPicker,
+    super.key,
+  });
 
   @override
   State<DetalhePage> createState() => _DetalhePageState();
@@ -24,7 +35,11 @@ class _DetalhePageState extends State<DetalhePage> {
     final editado = await Navigator.push<ItemCatalogo>(
       context,
       MaterialPageRoute<ItemCatalogo>(
-        builder: (_) => FormularioPage(itemInicial: _itemAtual),
+        builder: (_) => FormularioPage(
+          itemInicial: _itemAtual,
+          bookSearchRepository: widget.bookSearchRepository,
+          photoPicker: widget.photoPicker,
+        ),
       ),
     );
 
@@ -111,6 +126,21 @@ class _DetalhePageState extends State<DetalhePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (_itemAtual.fotoLocalBase64?.isNotEmpty == true) ...[
+                  Center(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.memory(
+                        base64Decode(_itemAtual.fotoLocalBase64!),
+                        height: 240,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) =>
+                            const Icon(Icons.broken_image_outlined, size: 48),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

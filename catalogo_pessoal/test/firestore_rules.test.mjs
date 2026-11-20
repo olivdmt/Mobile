@@ -86,6 +86,36 @@ test('Firestore rules allow the owner and reject other identities and invalid wr
       administrator: true,
     }));
     await assertSucceeds(deleteDoc(aliceTask));
+
+    const aliceItem = doc(alice, 'itens_catalogo/item-1');
+    const catalogItem = {
+      titulo: 'Livro exemplo',
+      categoria: 'Livro',
+      descricao: 'Descrição',
+      status: 'queroConhecer',
+      favorito: false,
+      ownerId: 'alice',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+    await assertSucceeds(setDoc(aliceItem, catalogItem));
+    await assertSucceeds(getDoc(aliceItem));
+    await assertSucceeds(
+      getDocs(query(collection(alice, 'itens_catalogo'), where('ownerId', '==', 'alice'))),
+    );
+    await assertSucceeds(updateDoc(aliceItem, {
+      status: 'concluido', favorito: true, updatedAt: serverTimestamp(),
+    }));
+    await assertFails(getDoc(doc(bob, 'itens_catalogo/item-1')));
+    await assertFails(getDocs(collection(anonymous, 'itens_catalogo')));
+    await assertFails(updateDoc(aliceItem, { ownerId: 'bob' }));
+    await assertFails(setDoc(doc(alice, 'itens_catalogo/invalid'), {
+      ...catalogItem, titulo: 'x',
+    }));
+    await assertFails(setDoc(doc(alice, 'itens_catalogo/extra'), {
+      ...catalogItem, internalPhoto: 'should-not-be-uploaded',
+    }));
+    await assertSucceeds(deleteDoc(aliceItem));
   } finally {
     await environment.cleanup();
   }
