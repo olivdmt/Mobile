@@ -1,57 +1,92 @@
-# Relatório final — Mobile II
-
-> Rascunho de trabalho, não é ainda o PDF de submissão. Preencher a versão remota (tag/hash), anexar capturas próprias e resultados finais de release antes de exportar. Não usar evidências de exemplo fictício.
+# Trabalho final Mobile II — Catálogo Pessoal
 
 ## 1. Identificação e produto
 
-**Estudante:** Mateus Dayson de Oliveira
-**Matrícula:** 0031595
-**Turma:** ADS – Turma de Quarta 2025/2026
-**Aplicativo:** Catálogo Pessoal
-**Problema e público:** leitores e estudantes que precisam organizar livros e referências, acompanhar status e consultar os próprios registros por conta autenticada.
-**Fluxo:** cadastro/login → catálogo vazio/carregado/cache → cadastrar ou buscar livro → detalhe/edição/favorito/status → exclusão → logout.
+**Estudante:** Mateus Dayson de Oliveira  
+**Matrícula:** 0031595  
+**Turma:** ADS — Turma de Quarta 2025/2026  
+**Autoria:** trabalho individual.  
+**Produto:** Catálogo Pessoal, aplicativo Flutter para leitores e estudantes que querem organizar livros e referências, acompanhar seu status e consultar seus próprios registros.
+
+O fluxo principal é cadastro/login, catálogo vazio ou carregado, inclusão de referência manual ou por busca, edição de metadados e estado, exclusão e logout. Cada pessoa acessa apenas os registros associados à sua conta. Fotos escolhidas ou capturadas são armazenadas no cache local; não são enviadas ao Firestore.
 
 ## 2. Repositório, versão e reprodução
 
-**Repositório configurado:** https://github.com/olivdmt/Mobile
-**Subdiretório:** `catalogo_pessoal/`
-**Tag ou hash remoto avaliado:** PENDENTE — publicar a revisão e anotar o identificador remoto exato.
-**Versão do app:** 1.0.0+1
-**Ambiente validado:** Flutter 3.47.0 / Dart 3.13.0; Node usado para suíte Firestore; emulador Firestore local.
-**Reprodução:** `flutter pub get`, `flutter run`; emuladores com `firebase emulators:start --project demo-catalogo-pessoal --only auth,firestore` e `flutter run --dart-define=USE_FIREBASE_EMULATORS=true`.
+- Repositório: https://github.com/olivdmt/Mobile
+- Diretório do aplicativo: `catalogo_pessoal/`
+- Branch publicada: `codex/m2-final-work`
+- Tag publicada: `m2-final-v1.0.0`
+- Commit exato: `5014c214dbc6f31172fb090abe621b27946f7a55`
+- Versão Flutter: `1.0.0+1`
+- Ambiente validado: Flutter 3.47.0, Dart 3.13.0, JDK Temurin 21.0.13, Gradle 8.14.3, Android Gradle Plugin 8.13.2, Kotlin Gradle Plugin 2.4.0, Android Build Tools 36.0.0, NDK 28.2.13676358 e Node.js/Firebase CLI para emuladores.
 
-## 3. Matriz de evidências
+Reprodução a partir da tag:
 
-| Nº | Critério | Implementação/evidência no projeto | Estado da evidência |
-|---:|---|---|---|
-| 1 | Produto, autoria, problema, público e fluxo | Esta seção e telas `lib/screens/` | Capturas próprias pendentes |
-| 2 | Repositório e versão reproduzível | URL acima; `pubspec.yaml`, `firebase.json`, README | Hash/tag remotos pendentes |
-| 3 | MVVM observável | `ListaPage` → `CatalogViewModel` → `CatalogRepository` → `FirestoreCatalogService` | Código presente |
-| 4 | Loading, sucesso, vazio, erro, recuperação | `CatalogStatus`, `ListaPage`, `retry()` | Teste VM presente; capturas pendentes |
-| 5 | Serviço externo e falhas | `OpenLibraryBookRepository`, VM de busca; fallback de preenchimento manual | Testes com resposta e HTTP 503 presentes |
-| 6 | Cache/offline | `SharedPreferencesCatalogCache`, dados por UID, banner cache; escrita requer conexão | Código presente; captura offline pendente |
-| 7 | Sessão e logout | Firebase Auth, `AuthGate`, `SignedInCatalogScreen`; logout remove cache privado | Testes de sessão existentes |
-| 8 | CRUD e vínculo UID | `itens_catalogo`, serviço/repositório; query e criação associados ao UID | Regras permitem CRUD dono; teste instrumentado preparado |
-| 9 | Segurança permitida/negada | `firestore.rules`; teste com dono, outro UID, anônimo, campos inválidos | `npm run test:rules` aprovado |
-| 10 | Recurso nativo | `image_picker`, câmera/galeria, recusa com alternativa; foto somente em cache local | Implementação presente; captura em Android pendente |
-| 11 | Unitários | `test/features/catalog_view_model_test.dart`, `open_library_book_repository_test.dart` | `flutter test`: 23 testes aprovados |
-| 12 | Widget e integração | `test/screens/`, `integration_test/catalog_crud_flow_test.dart` | Widget aprovado; fluxo instrumentado ainda não executado |
-| 13 | Análise e release | versão em `pubspec.yaml`, artefatos esperados no README | `flutter analyze` aprovado; builds bloqueados pela versão Java local; não atestar APK/AAB |
+```sh
+git clone https://github.com/olivdmt/Mobile.git
+cd Mobile/catalogo_pessoal
+git checkout m2-final-v1.0.0
+flutter pub get
+flutter run
+```
 
-## 4. Arquitetura, serviço e offline
+Para testar isoladamente com Firebase, inicie Auth e Firestore pelos emuladores. Em release, configure um keystore próprio por `android/key.properties` ou pelas quatro variáveis `ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` e `ANDROID_KEY_PASSWORD`; nenhum segredo está no Git. Consulte `README.md` para detalhes.
 
-A View desenha catálogo e formulários. `CatalogViewModel` controla estados, erros, UID e comandos. `CatalogRepository` é o ponto de orquestração entre cache e Firestore; `FirestoreCatalogService` converte documentos. A busca externa usa Open Library com consulta limitada a seis resultados, timeout e tratamento de erros. O cache local recupera o catálogo antes da conexão remota, identificando sua origem e data. O app permite leitura do último cache offline e informa que alterações precisam de conexão; não implementa fila de sincronização de escrita.
+## 3. Arquitetura, estados, serviço Web e offline
 
-## 5. Autenticação, CRUD e regras
+A tela/View delega o estado e os comandos ao ViewModel; o Repository aplica UID e coordena cache e Firebase Service; os Services convertem dados externos. Os pontos principais estão em `lib/screens/`, `lib/features/catalog/presentation/view_models/catalog_view_model.dart`, `lib/features/catalog/data/repositories/catalog_repository.dart` e `lib/features/catalog/data/services/firestore_catalog_service.dart`.
 
-Firebase Authentication usa e-mail/senha e mantém a sessão. As telas autenticadas são construídas pelo `AuthGate`. Cada item tem `ownerId`, e consultas filtram pelo UID corrente. `firestore.rules` valida campos, tamanhos e tipos; impede troca do proprietário e nega leitura/escrita de outras contas. O teste de regras comprova operações do dono e nega as tentativas de terceiros, anônimos e payloads inválidos.
+`CatalogStatus` cobre loading, success, empty e failure. Falhas exibem ação `retry()`. A busca Open Library está em `lib/features/books/data/open_library_book_repository.dart`: limita a seis resultados, tem timeout, converte os dados e trata HTTP inválido/503; o preenchimento manual continua disponível.
 
-## 6. Recurso nativo, privacidade e testes
+`SharedPreferencesCatalogCache` persiste o último catálogo por UID. A tela pode mostrar esse cache e sinaliza a origem; sem conexão, leitura continua disponível e o app informa que gravações exigem rede. Não há fila offline de escrita. HTTP claro está liberado somente para debug, para conectar o Android Emulator a `10.0.2.2`; o manifest de release não habilita tráfego claro.
 
-A câmera e galeria usam `image_picker`. Se a permissão da câmera for negada, o fluxo oferece a galeria ou continuação sem foto. A foto é redimensionada e guardada no cache local segmentado por UID; não é enviada ao Firestore e o cache é removido no logout. Testes unitários cobrem transições do catálogo, falha/repetição, UID e conversão/resposta externa. Testes widget existentes cobrem telas e formulário. O teste instrumentado cobre cadastro, criação, edição e exclusão via emuladores e precisa ser executado em dispositivo/emulador antes da entrega.
+## 4. Autenticação, CRUD, UID e segurança
 
-## 7. Análise, versão, assinatura e fontes
+Firebase Authentication controla cadastro, login, persistência de sessão, rotas autenticadas e logout. `AuthGate` responde ao estado da sessão; o logout remove cache privado do usuário. `lib/features/auth/` contém Services, Repositories e ViewModels.
 
-Análise local executada: `flutter analyze` sem issues. Testes: `flutter test` aprovado; `npm run test:rules` aprovado. Regras/índices publicados no projeto `catalogopessoal-54703`. Versão: 1.0.0+1. Ainda faltam execução do teste instrumentado, APK/AAB atualizados, instalação do APK, chave de release própria, hashes, tag/hash remoto e capturas legíveis. O JDK instalado nesta máquina é 25; Gradle 8.13 requer JDK compatível e o build foi impedido pelo ambiente. O keystore não deve ser compartilhado ou versionado.
+O catálogo persiste em `itens_catalogo/{id}`. Cada documento contém `ownerId`; o Repository fornece o UID corrente e a consulta Firestore filtra por ele. `firestore.rules` exige identidade autenticada, igualdade entre UID e proprietário e campos/tipos permitidos. O conjunto de regras permite operações do proprietário e nega usuário diferente, anônimo e payload inválido. O teste integrado Android com Auth/Firestore Emulator percorreu cadastro, criação, edição e exclusão com sucesso.
 
-**Fontes técnicas:** documentação da [API Search da Open Library](https://openlibrary.org/dev/docs/api/search), [image_picker](https://pub.dev/packages/image_picker), [shared_preferences](https://pub.dev/packages/shared_preferences), [Flutter: migração Android Gradle Plugin](https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin) e [regras do Firestore](https://firebase.google.com/docs/firestore/security/get-started).
+## 5. Recurso nativo, privacidade e testes
+
+`lib/features/catalog/data/services/catalog_photo_picker.dart` usa `image_picker`, limita resolução e qualidade, e solicita somente os dados necessários. A imagem fica como dado local em cache por UID e é removida no logout; não é enviada ao Firestore. Se a permissão da câmera for negada, `lib/screens/formulario_page.dart` oferece abrir a galeria ou seguir sem foto. A implementação está localizada, mas não foi produzida captura da sequência de permissão negada nesta execução; essa evidência visual é parcial.
+
+Resultados registrados:
+
+- `flutter analyze`: sem issues.
+- `flutter test`: 23 testes unitários e widget aprovados.
+- `npm run test:rules`: operação permitida ao dono e recusas de segurança aprovadas.
+- `firebase emulators:exec --project demo-catalogo-pessoal --only auth,firestore "flutter test integration_test/catalog_crud_flow_test.dart -d emulator-5554 --dart-define=USE_FIREBASE_EMULATORS=true"`: aprovado (`+1: All tests passed!`), incluindo cadastro, create, update e delete.
+- APK release instalado com sucesso no Android Emulator. A jornada acima confirmou a interação funcional em debug, conectada aos emuladores Firebase.
+
+## 6. Matriz dos 13 critérios
+
+| Nº | Evidência e localização | Estado |
+|---:|---|---|
+| 1 | Identificação, problema, público, fluxo e autoria nesta seção; versão tagueada | Atendido |
+| 2 | Repositório, tag, hash, ambiente e passos de reprodução na seção 2 | Atendido |
+| 3 | View → ViewModel → Repository → Service, caminhos na seção 3 | Atendido |
+| 4 | `CatalogStatus`, `retry()`, testes do ViewModel e teste widget; falta sequência de capturas por estado | Parcial |
+| 5 | `OpenLibraryBookRepository` e testes de sucesso, conversão e falha HTTP | Atendido |
+| 6 | Cache local por UID, origem sinalizada e leitura offline; sem teste/captura dedicada nesta revisão | Parcial |
+| 7 | Firebase Auth, `AuthGate`, persistência e logout; teste da sessão e jornada de cadastro | Atendido |
+| 8 | CRUD Firestore com ownerId; fluxo instrumentado Android aprovado | Atendido |
+| 9 | `firestore.rules`; testes owner permitido, outro UID/anônimo/payload inválido negados | Atendido |
+| 10 | `image_picker`, alternativa na negação e armazenamento privado local; falta captura real da negação | Parcial |
+| 11 | `test/features/catalog_view_model_test.dart`, `open_library_book_repository_test.dart`; suíte Flutter aprovada | Atendido |
+| 12 | `test/screens/`, `test/widgets/` e `integration_test/catalog_crud_flow_test.dart`; aprovado em Android | Atendido |
+| 13 | Análise, versão, assinatura, APK/AAB, hashes, instalação e commit/tag na seção 7 | Atendido |
+
+As imagens em diagramas desta versão descrevem os fluxos e responsabilidades do código; não são apresentadas como capturas de telas. Permanecem parciais os itens 4, 6 e 10 porque faltam capturas próprias focadas em seus estados/comportamentos.
+
+## 7. Release, verificação e fontes
+
+Foram gerados APK e AAB assinados com o keystore de release local. O APK foi verificado pelo `apksigner` com assinatura v2 válida; o AAB foi verificado pelo `jarsigner` e está assinado pelo certificado de upload indicado abaixo. Como a chave é privada e autoassinada, a ausência de uma cadeia de CA confiável é esperada. O segredo do keystore está ignorado pelo Git e não aparece neste documento.
+
+| Artefato | Caminho no projeto | Tamanho | SHA-256 |
+|---|---|---:|---|
+| APK | `build/app/outputs/flutter-apk/app-release.apk` | 55.925.983 bytes | `BE59B756169977BBD488522D99344D91E73271AE31C35BAB28356001DF4404B1` |
+| AAB | `build/app/outputs/bundle/release/app-release.aab` | 56.362.836 bytes | `3E333EC1E7CB99E06272FC80F9E67DFE64321BB14E01DA1C173C96A7E8F55D1F` |
+
+Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Versão identificável: tag remota `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. APK instalado no emulador com `adb install -r`.
+
+Fontes técnicas consultadas: [Open Library Search API](https://openlibrary.org/dev/docs/api/search), [image_picker](https://pub.dev/packages/image_picker), [shared_preferences](https://pub.dev/packages/shared_preferences), [regras de segurança do Firestore](https://firebase.google.com/docs/firestore/security/get-started), [FlutterFire e emuladores](https://firebase.google.com/docs/emulator-suite/connect_auth) e [Kotlin Gradle Plugin: compatibilidade](https://kotlinlang.org/docs/gradle-configure-project.html).
