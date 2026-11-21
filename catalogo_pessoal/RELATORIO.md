@@ -17,8 +17,8 @@ O apêndice visual do PDF contém capturas reais das telas de login e cadastro o
 - Repositório: https://github.com/olivdmt/Mobile
 - Diretório do aplicativo: `catalogo_pessoal/`
 - Branch publicada: `codex/m2-final-work`
-- Tag publicada: `m2-final-v1.0.0`
-- Commit exato: `5014c214dbc6f31172fb090abe621b27946f7a55`
+- Tag do aplicativo/release: `m2-final-v1.0.0` (`5014c214dbc6f31172fb090abe621b27946f7a55`)
+- Tag das evidências e testes adicionais: `m2-evidencia-v1.0.1` (`6f3166aa2feb0baaf749f5f74e1a031f6fe04210`)
 - Versão Flutter: `1.0.0+1`
 - Ambiente validado: Flutter 3.47.0, Dart 3.13.0, JDK Temurin 21.0.13, Gradle 8.14.3, Android Gradle Plugin 8.13.2, Kotlin Gradle Plugin 2.4.0, Android Build Tools 36.0.0, NDK 28.2.13676358 e Node.js/Firebase CLI para emuladores.
 
@@ -91,6 +91,6 @@ Foram gerados APK e AAB assinados com o keystore de release local. O APK foi ver
 | APK | `build/app/outputs/flutter-apk/app-release.apk` | 55.925.983 bytes | `BE59B756169977BBD488522D99344D91E73271AE31C35BAB28356001DF4404B1` |
 | AAB | `build/app/outputs/bundle/release/app-release.aab` | 56.362.836 bytes | `3E333EC1E7CB99E06272FC80F9E67DFE64321BB14E01DA1C173C96A7E8F55D1F` |
 
-Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Versão identificável: tag remota `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. APK instalado no emulador com `adb install -r`.
+Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Release do app: tag `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. Os testes e evidências adicionais desta revisão estão na tag remota `m2-evidencia-v1.0.1`, commit `6f3166aa2feb0baaf749f5f74e1a031f6fe04210`; essa revisão alterou testes/documentação, sem modificar o código executável usado para gerar APK/AAB. APK instalado no emulador com `adb install -r`.
 
 Fontes técnicas consultadas: [Open Library Search API](https://openlibrary.org/dev/docs/api/search), [image_picker](https://pub.dev/packages/image_picker), [shared_preferences](https://pub.dev/packages/shared_preferences), [regras de segurança do Firestore](https://firebase.google.com/docs/firestore/security/get-started), [FlutterFire e emuladores](https://firebase.google.com/docs/emulator-suite/connect_auth) e [Kotlin Gradle Plugin: compatibilidade](https://kotlinlang.org/docs/gradle-configure-project.html).
