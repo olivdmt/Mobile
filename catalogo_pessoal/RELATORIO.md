@@ -38,9 +38,9 @@ Para testar isoladamente com Firebase, inicie Auth e Firestore pelos emuladores.
 
 A tela/View delega o estado e os comandos ao ViewModel; o Repository aplica UID e coordena cache e Firebase Service; os Services convertem dados externos. Os pontos principais estão em `lib/screens/`, `lib/features/catalog/presentation/view_models/catalog_view_model.dart`, `lib/features/catalog/data/repositories/catalog_repository.dart` e `lib/features/catalog/data/services/firestore_catalog_service.dart`.
 
-`CatalogStatus` cobre loading, success, empty e failure. Falhas exibem ação `retry()`. A busca Open Library está em `lib/features/books/data/open_library_book_repository.dart`: limita a seis resultados, tem timeout, converte os dados e trata HTTP inválido/503; o preenchimento manual continua disponível.
+`CatalogStatus` cobre loading, success, empty e failure. Falhas exibem ação `retry()`. O teste de widget `test/lista_page_test.dart` verifica loading, erro com ação de retry e o banner de cache offline; o teste unitário do ViewModel cobre vazio, sucesso, falha e retomada. A busca Open Library está em `lib/features/books/data/open_library_book_repository.dart`: limita a seis resultados, tem timeout, converte os dados e trata HTTP inválido/503; o preenchimento manual continua disponível.
 
-`SharedPreferencesCatalogCache` persiste o último catálogo por UID. A tela pode mostrar esse cache e sinaliza a origem; sem conexão, leitura continua disponível e o app informa que gravações exigem rede. Não há fila offline de escrita. HTTP claro está liberado somente para debug, para conectar o Android Emulator a `10.0.2.2`; o manifest de release não habilita tráfego claro.
+`SharedPreferencesCatalogCache` persiste o último catálogo por UID. A tela mostra o cache e sinaliza a origem; o teste widget verifica o item local e o aviso de que gravações exigem rede. Não há fila offline de escrita. HTTP claro está liberado somente para debug, para conectar o Android Emulator a `10.0.2.2`; o manifest de release não habilita tráfego claro.
 
 ## 4. Autenticação, CRUD, UID e segurança
 
@@ -50,12 +50,13 @@ O catálogo persiste em `itens_catalogo/{id}`. Cada documento contém `ownerId`;
 
 ## 5. Recurso nativo, privacidade e testes
 
-`lib/features/catalog/data/services/catalog_photo_picker.dart` usa `image_picker`, limita resolução e qualidade, e solicita somente os dados necessários. A imagem fica como dado local em cache por UID e é removida no logout; não é enviada ao Firestore. Se a permissão da câmera for negada, `lib/screens/formulario_page.dart` oferece abrir a galeria ou seguir sem foto. A implementação está localizada, mas não foi produzida captura da sequência de permissão negada nesta execução; essa evidência visual é parcial.
+`lib/features/catalog/data/services/catalog_photo_picker.dart` usa `image_picker`, limita resolução e qualidade, e solicita somente os dados necessários. A imagem fica como dado local em cache por UID e é removida no logout; não é enviada ao Firestore. Se a permissão da câmera for negada, `lib/screens/formulario_page.dart` oferece abrir a galeria ou seguir sem foto. `test/screens/formulario_page_test.dart` injeta uma câmera negada e verifica as duas alternativas. A negação é simulada por um fake de teste; a sequência com a permissão real do Android continua sem captura e deixa este critério parcial.
 
 Resultados registrados:
 
 - `flutter analyze`: sem issues.
-- `flutter test`: 23 testes unitários e widget aprovados.
+- `flutter test`: 25 testes unitários e widget aprovados após esta revisão.
+- Testes direcionados atualizados: `flutter test test/lista_page_test.dart test/screens/formulario_page_test.dart test/features/catalog_view_model_test.dart` — 11 testes aprovados. A suíte exercita loading, falha recuperável, cache offline e permissão de câmera negada.
 - `npm run test:rules`: operação permitida ao dono e recusas de segurança aprovadas.
 - `firebase emulators:exec --project demo-catalogo-pessoal --only auth,firestore "flutter test integration_test/catalog_crud_flow_test.dart -d emulator-5554 --dart-define=USE_FIREBASE_EMULATORS=true"`: aprovado (`+1: All tests passed!`), incluindo cadastro, create, update e delete.
 - APK release instalado com sucesso no Android Emulator. A jornada acima confirmou a interação funcional em debug, conectada aos emuladores Firebase.
@@ -68,18 +69,18 @@ Resultados registrados:
 | 1 | Identificação, problema, público, fluxo e autoria nesta seção; capturas de login/cadastro no apêndice visual | Atendido |
 | 2 | Repositório, tag, hash, ambiente e passos de reprodução na seção 2 | Atendido |
 | 3 | View → ViewModel → Repository → Service, caminhos na seção 3 | Atendido |
-| 4 | `CatalogStatus`, `retry()`, testes do ViewModel e teste widget; falta sequência de capturas por estado | Parcial |
+| 4 | `CatalogStatus`, `retry()`, `test/features/catalog_view_model_test.dart` e teste widget de loading/erro com retry em `test/lista_page_test.dart` | Atendido |
 | 5 | `OpenLibraryBookRepository` e testes de sucesso, conversão e falha HTTP | Atendido |
-| 6 | Cache local por UID, origem sinalizada e leitura offline; sem teste/captura dedicada nesta revisão | Parcial |
+| 6 | Cache local por UID e teste widget `test/lista_page_test.dart`, com banner de origem e aviso de escrita conectada | Atendido |
 | 7 | Firebase Auth, `AuthGate`, persistência e logout; capturas de login/cadastro e jornada Android aprovada | Atendido |
 | 8 | CRUD Firestore com ownerId; fluxo instrumentado Android aprovado | Atendido |
 | 9 | `firestore.rules`; testes owner permitido, outro UID/anônimo/payload inválido negados | Atendido |
-| 10 | `image_picker`, alternativa na negação e armazenamento privado local; falta captura real da negação | Parcial |
+| 10 | `image_picker`, teste simulado da negação, alternativas e privacidade; falta a sequência com permissão real no Android | Parcial |
 | 11 | `test/features/catalog_view_model_test.dart`, `open_library_book_repository_test.dart`; suíte Flutter aprovada | Atendido |
 | 12 | `test/screens/`, `test/widgets/` e `integration_test/catalog_crud_flow_test.dart`; aprovado em Android | Atendido |
 | 13 | Análise, versão, assinatura, APK/AAB, hashes, instalação e commit/tag na seção 7 | Atendido |
 
-Os diagramas explicam fluxos e responsabilidades do código; as capturas de telas do app estão no apêndice do PDF. Permanecem parciais os itens 4, 6 e 10 porque faltam capturas focadas nos estados de catálogo, no cenário offline e na permissão de câmera negada.
+Os diagramas explicam fluxos e responsabilidades do código. O apêndice contém capturas reais do app no emulador para login e cadastro. Loading, erro, cache offline e diálogo de câmera negada foram executados em testes widget; o estado vazio também tem teste. O critério 10 permanece parcial porque a permissão real do Android não foi negada em uma captura do emulador.
 
 ## 7. Release, verificação e fontes
 
