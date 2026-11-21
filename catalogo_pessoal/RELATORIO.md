@@ -10,6 +10,8 @@
 
 O fluxo principal é cadastro/login, catálogo vazio ou carregado, inclusão de referência manual ou por busca, edição de metadados e estado, exclusão e logout. Cada pessoa acessa apenas os registros associados à sua conta. Fotos escolhidas ou capturadas são armazenadas no cache local; não são enviadas ao Firestore.
 
+O apêndice visual do PDF contém capturas reais das telas de login e cadastro obtidas no Android Emulator, sem envio de credenciais.
+
 ## 2. Repositório, versão e reprodução
 
 - Repositório: https://github.com/olivdmt/Mobile
@@ -57,18 +59,19 @@ Resultados registrados:
 - `npm run test:rules`: operação permitida ao dono e recusas de segurança aprovadas.
 - `firebase emulators:exec --project demo-catalogo-pessoal --only auth,firestore "flutter test integration_test/catalog_crud_flow_test.dart -d emulator-5554 --dart-define=USE_FIREBASE_EMULATORS=true"`: aprovado (`+1: All tests passed!`), incluindo cadastro, create, update e delete.
 - APK release instalado com sucesso no Android Emulator. A jornada acima confirmou a interação funcional em debug, conectada aos emuladores Firebase.
+- Capturas reais de login e cadastro adicionadas ao apêndice visual do PDF.
 
 ## 6. Matriz dos 13 critérios
 
 | Nº | Evidência e localização | Estado |
 |---:|---|---|
-| 1 | Identificação, problema, público, fluxo e autoria nesta seção; versão tagueada | Atendido |
+| 1 | Identificação, problema, público, fluxo e autoria nesta seção; capturas de login/cadastro no apêndice visual | Atendido |
 | 2 | Repositório, tag, hash, ambiente e passos de reprodução na seção 2 | Atendido |
 | 3 | View → ViewModel → Repository → Service, caminhos na seção 3 | Atendido |
 | 4 | `CatalogStatus`, `retry()`, testes do ViewModel e teste widget; falta sequência de capturas por estado | Parcial |
 | 5 | `OpenLibraryBookRepository` e testes de sucesso, conversão e falha HTTP | Atendido |
 | 6 | Cache local por UID, origem sinalizada e leitura offline; sem teste/captura dedicada nesta revisão | Parcial |
-| 7 | Firebase Auth, `AuthGate`, persistência e logout; teste da sessão e jornada de cadastro | Atendido |
+| 7 | Firebase Auth, `AuthGate`, persistência e logout; capturas de login/cadastro e jornada Android aprovada | Atendido |
 | 8 | CRUD Firestore com ownerId; fluxo instrumentado Android aprovado | Atendido |
 | 9 | `firestore.rules`; testes owner permitido, outro UID/anônimo/payload inválido negados | Atendido |
 | 10 | `image_picker`, alternativa na negação e armazenamento privado local; falta captura real da negação | Parcial |
@@ -76,7 +79,7 @@ Resultados registrados:
 | 12 | `test/screens/`, `test/widgets/` e `integration_test/catalog_crud_flow_test.dart`; aprovado em Android | Atendido |
 | 13 | Análise, versão, assinatura, APK/AAB, hashes, instalação e commit/tag na seção 7 | Atendido |
 
-As imagens em diagramas desta versão descrevem os fluxos e responsabilidades do código; não são apresentadas como capturas de telas. Permanecem parciais os itens 4, 6 e 10 porque faltam capturas próprias focadas em seus estados/comportamentos.
+Os diagramas explicam fluxos e responsabilidades do código; as capturas de telas do app estão no apêndice do PDF. Permanecem parciais os itens 4, 6 e 10 porque faltam capturas focadas nos estados de catálogo, no cenário offline e na permissão de câmera negada.
 
 ## 7. Release, verificação e fontes
 
