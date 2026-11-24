@@ -19,6 +19,7 @@ O apêndice visual do PDF contém capturas reais das telas de login e cadastro o
 - Branch publicada: `codex/m2-final-work`
 - Tag do aplicativo/release: `m2-final-v1.0.0` (`5014c214dbc6f31172fb090abe621b27946f7a55`)
 - Tag das evidências e testes adicionais: `m2-evidencia-v1.0.1` (`6f3166aa2feb0baaf749f5f74e1a031f6fe04210`)
+- Tag deste relatório final e da evidência real de permissão: `m2-evidencia-v1.0.2`
 - Versão Flutter: `1.0.0+1`
 - Ambiente validado: Flutter 3.47.0, Dart 3.13.0, JDK Temurin 21.0.13, Gradle 8.14.3, Android Gradle Plugin 8.13.2, Kotlin Gradle Plugin 2.4.0, Android Build Tools 36.0.0, NDK 28.2.13676358 e Node.js/Firebase CLI para emuladores.
 
@@ -50,7 +51,7 @@ O catálogo persiste em `itens_catalogo/{id}`. Cada documento contém `ownerId`;
 
 ## 5. Recurso nativo, privacidade e testes
 
-`lib/features/catalog/data/services/catalog_photo_picker.dart` usa `image_picker`, limita resolução e qualidade, e solicita somente os dados necessários. A imagem fica como dado local em cache por UID e é removida no logout; não é enviada ao Firestore. Se a permissão da câmera for negada, `lib/screens/formulario_page.dart` oferece abrir a galeria ou seguir sem foto. `test/screens/formulario_page_test.dart` injeta uma câmera negada e verifica as duas alternativas. A negação é simulada por um fake de teste; a sequência com a permissão real do Android continua sem captura e deixa este critério parcial.
+`lib/features/catalog/data/services/catalog_photo_picker.dart` usa `image_picker`, limita resolução e qualidade, e solicita somente os dados necessários. A imagem fica como dado local em cache por UID e é removida no logout; não é enviada ao Firestore. Se a permissão da câmera for negada, `lib/screens/formulario_page.dart` oferece abrir a galeria ou seguir sem foto. `test/screens/formulario_page_test.dart` cobre as duas alternativas com uma câmera negada simulada. Além do teste, o fluxo foi executado no Android Emulator: a permissão foi negada no diálogo real do sistema e o app mostrou o fallback. As duas capturas estão no apêndice visual do PDF.
 
 Resultados registrados:
 
@@ -60,7 +61,7 @@ Resultados registrados:
 - `npm run test:rules`: operação permitida ao dono e recusas de segurança aprovadas.
 - `firebase emulators:exec --project demo-catalogo-pessoal --only auth,firestore "flutter test integration_test/catalog_crud_flow_test.dart -d emulator-5554 --dart-define=USE_FIREBASE_EMULATORS=true"`: aprovado (`+1: All tests passed!`), incluindo cadastro, create, update e delete.
 - APK release instalado com sucesso no Android Emulator. A jornada acima confirmou a interação funcional em debug, conectada aos emuladores Firebase.
-- Capturas reais de login e cadastro adicionadas ao apêndice visual do PDF.
+- Capturas reais de login, cadastro, pedido de permissão Android e fallback após a negação adicionadas ao apêndice visual do PDF.
 
 ## 6. Matriz dos 13 critérios
 
@@ -75,12 +76,12 @@ Resultados registrados:
 | 7 | Firebase Auth, `AuthGate`, persistência e logout; capturas de login/cadastro e jornada Android aprovada | Atendido |
 | 8 | CRUD Firestore com ownerId; fluxo instrumentado Android aprovado | Atendido |
 | 9 | `firestore.rules`; testes owner permitido, outro UID/anônimo/payload inválido negados | Atendido |
-| 10 | `image_picker`, teste simulado da negação, alternativas e privacidade; falta a sequência com permissão real no Android | Parcial |
+| 10 | `image_picker`, teste das alternativas, diálogo real de permissão negada e tela de fallback; foto local, privada e não enviada ao Firestore | Atendido |
 | 11 | `test/features/catalog_view_model_test.dart`, `open_library_book_repository_test.dart`; suíte Flutter aprovada | Atendido |
 | 12 | `test/screens/`, `test/widgets/` e `integration_test/catalog_crud_flow_test.dart`; aprovado em Android | Atendido |
 | 13 | Análise, versão, assinatura, APK/AAB, hashes, instalação e commit/tag na seção 7 | Atendido |
 
-Os diagramas explicam fluxos e responsabilidades do código. O apêndice contém capturas reais do app no emulador para login e cadastro. Loading, erro, cache offline e diálogo de câmera negada foram executados em testes widget; o estado vazio também tem teste. O critério 10 permanece parcial porque a permissão real do Android não foi negada em uma captura do emulador.
+Os diagramas explicam fluxos e responsabilidades do código. O apêndice contém capturas reais do app no emulador para login, cadastro, solicitação de câmera e fallback após a negação real. Loading, erro, cache offline e permissão negada também são cobertos por testes; o estado vazio tem teste widget.
 
 ## 7. Release, verificação e fontes
 
@@ -91,6 +92,6 @@ Foram gerados APK e AAB assinados com o keystore de release local. O APK foi ver
 | APK | `build/app/outputs/flutter-apk/app-release.apk` | 55.925.983 bytes | `BE59B756169977BBD488522D99344D91E73271AE31C35BAB28356001DF4404B1` |
 | AAB | `build/app/outputs/bundle/release/app-release.aab` | 56.362.836 bytes | `3E333EC1E7CB99E06272FC80F9E67DFE64321BB14E01DA1C173C96A7E8F55D1F` |
 
-Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Release do app: tag `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. Os testes e evidências adicionais desta revisão estão na tag remota `m2-evidencia-v1.0.1`, commit `6f3166aa2feb0baaf749f5f74e1a031f6fe04210`; essa revisão alterou testes/documentação, sem modificar o código executável usado para gerar APK/AAB. APK instalado no emulador com `adb install -r`.
+Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Release do app: tag `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. Os testes adicionais estão na tag remota `m2-evidencia-v1.0.1`; este relatório final, incluindo a captura real da negação da câmera e a matriz 13/13, está na tag `m2-evidencia-v1.0.2`. As duas revisões alteraram testes/documentação/evidências, sem mudar o código executável usado para gerar APK/AAB. APK release instalado no emulador com `adb install -r`.
 
 Fontes técnicas consultadas: [Open Library Search API](https://openlibrary.org/dev/docs/api/search), [image_picker](https://pub.dev/packages/image_picker), [shared_preferences](https://pub.dev/packages/shared_preferences), [regras de segurança do Firestore](https://firebase.google.com/docs/firestore/security/get-started), [FlutterFire e emuladores](https://firebase.google.com/docs/emulator-suite/connect_auth) e [Kotlin Gradle Plugin: compatibilidade](https://kotlinlang.org/docs/gradle-configure-project.html).
