@@ -9,8 +9,11 @@ void main() {
   testWidgets('registers, creates, edits and deletes a private catalog item', (
     tester,
   ) async {
+    final binding = IntegrationTestWidgetsFlutterBinding.instance;
     await app.main();
     await tester.pumpAndSettle(const Duration(seconds: 2));
+    await binding.convertFlutterSurfaceToImage();
+    await tester.pump();
 
     await tester.tap(find.text('Criar uma conta'));
     await tester.pumpAndSettle();
@@ -39,15 +42,18 @@ void main() {
     await tester.tap(find.byKey(const Key('salvar_button')));
     await tester.pumpAndSettle(const Duration(seconds: 5));
     expect(find.text('Livro de integração'), findsOneWidget);
+    await binding.takeScreenshot('crud-create-success');
 
     await tester.tap(find.text('Livro de integração').first);
     await tester.pumpAndSettle();
+    await binding.takeScreenshot('crud-read-detail');
     await tester.tap(find.text('Editar').last);
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('titulo')), 'Livro alterado');
     await tester.tap(find.byKey(const Key('salvar_button')));
     await tester.pumpAndSettle(const Duration(seconds: 5));
     expect(find.text('Livro alterado'), findsWidgets);
+    await binding.takeScreenshot('crud-update-success');
 
     await tester.tap(find.text('Livro alterado').first);
     await tester.pumpAndSettle();
@@ -56,5 +62,6 @@ void main() {
     await tester.tap(find.text('Excluir').last);
     await tester.pumpAndSettle(const Duration(seconds: 5));
     expect(find.text('Livro alterado'), findsNothing);
+    await binding.takeScreenshot('crud-delete-success');
   });
 }

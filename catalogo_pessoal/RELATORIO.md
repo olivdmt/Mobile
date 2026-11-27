@@ -12,16 +12,16 @@ O fluxo principal é cadastro/login, catálogo vazio ou carregado, inclusão de 
 
 ### Escopo, limitações e evolução
 
-**Implementado:** autenticação, catálogo pessoal com CRUD por UID, busca Open Library, cache local de leitura, foto em cache privado, testes unitários/widget e fluxo integrado. **Limitações:** gravações exigem conexão; não há fila de sincronização offline. As capturas deste PDF não mostram a busca, a tela de catálogo com dados, todos os passos do CRUD nem o pós-logout. **Evoluções:** coletar essas capturas, implementar sincronização com resolução de conflitos e avaliar publicação em loja.
+**Implementado:** autenticação, catálogo pessoal com CRUD por UID, busca Open Library, cache local de leitura, foto em cache privado, testes unitários/widget e fluxo integrado. **Limitações:** gravações exigem conexão; não há fila de sincronização offline. As capturas mostram o CRUD; busca ao vivo e pós-logout não têm captura nesta edição. **Evoluções:** registrar esses dois fluxos e implementar sincronização com resolução de conflitos.
 
-O apêndice visual do PDF contém capturas reais das telas de login e cadastro obtidas no Android Emulator, sem envio de credenciais.
+O apêndice visual contém capturas reais de login, cadastro e das quatro operações CRUD no Android Emulator com Firebase Emulator Suite. O usuário de teste tem endereço `example.test` e não usa credenciais pessoais.
 
 ## 2. Repositório, versão e reprodução
 
 - Repositório: https://github.com/olivdmt/Mobile
 - Diretório do aplicativo: `catalogo_pessoal/`
 - Branch publicada: `codex/m2-final-report`
-- Tag final de avaliação: `m2-final-v1.1.0` (app, testes e relatório no mesmo snapshot Git).
+- Tag final de avaliação: `m2-final-v1.1.1` (app, testes, capturas e relatório no mesmo snapshot Git).
 - Proveniência do release binário: `m2-final-v1.0.0` (`5014c214dbc6f31172fb090abe621b27946f7a55`); a revisão final não altera código executável, conforme comparação entre tags.
 - Versão Flutter: `1.0.0+1`
 - Ambiente validado: Flutter 3.47.0, Dart 3.13.0, JDK Temurin 21.0.13, Gradle 8.14.3, Android Gradle Plugin 8.13.2, Kotlin Gradle Plugin 2.4.0, Android Build Tools 36.0.0, NDK 28.2.13676358 e Node.js/Firebase CLI para emuladores.
@@ -31,7 +31,7 @@ Reprodução a partir da tag:
 ```sh
 git clone https://github.com/olivdmt/Mobile.git
 cd Mobile/catalogo_pessoal
-git checkout m2-final-v1.1.0
+git checkout m2-final-v1.1.1
 flutter pub get
 flutter run
 ```
@@ -60,34 +60,34 @@ O catálogo persiste em `itens_catalogo/{id}`. Cada documento contém `ownerId`;
 
 Resultados verificados nesta revisão (27/11/2026):
 
-- `dart format --output=none --set-exit-if-changed lib test integration_test`: `Formatted 53 files (0 changed)`.
+- `dart format --output=none --set-exit-if-changed lib test integration_test` (revisão anterior): `Formatted 53 files (0 changed)`; nesta revisão, `dart format integration_test/catalog_crud_flow_test.dart integration_test/driver.dart` formatou os dois arquivos do fluxo de captura.
 - `flutter analyze --no-pub`: `No issues found! (ran in 20.4s)`.
 - `flutter test --no-pub --reporter expanded --concurrency=1`: `+25: All tests passed!`.
 - Cenários unitários relevantes: transições loading/empty/success e proveniência do cache; falha no stream e retry; create/update/delete e limpeza de cache por UID; conversão de resposta Open Library e falha 503; restauração de sessão e logout.
 - Cenários widget: estado vazio; itens carregados; loading/erro/retry/cache offline; validação do formulário; modo edição; câmera negada com alternativas.
 
-Execuções de integração Firebase/Firestore Rules e instalação do APK foram registradas na revisão anterior e estão referenciadas no código/tag de evidência. Não foram repetidas nesta sessão porque o AVD não ficou disponível. O teste Open Library usa `MockClient`: comprova conversão e tratamento de HTTP 503 em teste, não uma captura ao vivo da API. As capturas ausentes dos fluxos de catálogo, busca e CRUD estão identificadas como limitação, sem serem substituídas por imagens simuladas.
+O fluxo integrado foi executado nesta revisão no Pixel 9a API 36 com Auth/Firestore Emulator local: cadastro de usuário de teste, criação, leitura, edição e exclusão. `integration_test/driver.dart` salvou as quatro telas em `output/evidencias/crud/`; elas aparecem nas páginas 9–10. A integração terminou com `+1: All tests passed!`. O teste Open Library usa `MockClient`: comprova conversão e HTTP 503, não uma captura ao vivo da API. Busca externa e pós-logout continuam sem captura visual.
 ## 6. Matriz dos 13 critérios
 
 | Nº | Evidência no PDF | Arquivo, classe ou regra | Evidência disponível |
 |---:|---|---|---|
-| 1 | p.1–2, seção 1; p.8–9, figuras 5–6 | `RELATORIO.md`, seção 1; `lib/screens/login_page.dart`; `lib/screens/cadastro_page.dart` | Produto, problema, público, autoria e fluxo |
-| 2 | p.1–2, seção 2; p.7, reprodução | `README.md`; `pubspec.yaml`; tag `m2-final-v1.1.0` | Repositório, ambiente e comandos |
+| 1 | p.1–2, seção 1; p.8, figuras 5–6 | `RELATORIO.md`, seção 1; `lib/features/auth/presentation/views/sign_in_screen.dart`; telas de cadastro | Produto, problema, público, autoria e fluxo |
+| 2 | p.1–2, seção 2; p.7, reprodução | `README.md`; `pubspec.yaml`; tag `m2-final-v1.1.1` | Repositório, ambiente e comandos |
 | 3 | p.2, figura 1 e tabela de rastreabilidade | `lib/screens/lista_page.dart`; `lib/features/catalog/presentation/view_models/catalog_view_model.dart`; `lib/features/catalog/data/repositories/catalog_repository.dart`; `lib/features/catalog/data/services/firestore_catalog_service.dart` | View → ViewModel → Repository → Service |
-| 4 | p.3, estados; p.10, figura 7 | `catalog_view_model.dart`; `test/lista_page_test.dart`; `test/features/catalog_view_model_test.dart` | Estados e retry verificados por testes; diagrama esquemático, sem captura real de cada estado |
+| 4 | p.3, estados; p.5, validação | `catalog_view_model.dart`; `test/lista_page_test.dart`; `test/features/catalog_view_model_test.dart` | Estados e retry verificados por testes |
 | 5 | p.3, seção serviço; p.5, saída de testes | `lib/features/books/data/open_library_book_repository.dart`; `test/features/open_library_book_repository_test.dart` | Conversão e HTTP 503 com MockClient; sem evidência ao vivo da API |
-| 6 | p.3, estratégia offline; p.10, figura 7 | `lib/features/catalog/data/services/local_catalog_cache.dart`; `test/lista_page_test.dart`; `test/features/catalog_view_model_test.dart` | Cache por UID e origem verificadas em teste; sem captura real offline |
-| 7 | p.4, figura 3; p.8–9, figuras 5–6 | `lib/features/auth/`; `test/features/auth_session_view_model_test.dart`; `AuthGate` | Login/cadastro capturados; sessão/logout cobertos por teste, sem captura pós-logout |
-| 8 | p.4, fluxo e teste integrado registrado | `lib/features/catalog/data/repositories/catalog_repository.dart`; `lib/features/catalog/data/services/firestore_catalog_service.dart`; `integration_test/catalog_crud_flow_test.dart` | Create/read/update/delete no fluxo integrado; sem capturas de cada operação |
+| 6 | p.3, estratégia offline; p.5, validação | `lib/features/catalog/data/services/local_catalog_cache.dart`; `test/lista_page_test.dart`; `test/features/catalog_view_model_test.dart` | Cache por UID e origem verificadas em teste |
+| 7 | p.4, figura 3; p.8, figuras 5–6 | `lib/features/auth/`; `test/features/auth_session_view_model_test.dart`; `AuthGate` | Login/cadastro capturados; sessão/logout cobertos por teste |
+| 8 | p.4; p.9–10, figuras 7–10 | `lib/features/catalog/data/repositories/catalog_repository.dart`; `lib/features/catalog/data/services/firestore_catalog_service.dart`; `integration_test/catalog_crud_flow_test.dart`; `integration_test/driver.dart`; `output/evidencias/crud/*.png` | Create/read/update/delete no Android Emulator com Firebase Emulator; quatro capturas reais |
 | 9 | p.4, tabela A/B e linhas 76–88 | `firestore.rules:4–16,76–88`; `test/firestore_rules.test.mjs:33–34,90–118` | Alice permitida; Bob, anônimo e payload inválido negados |
 | 10 | p.5; p.11–12, figuras 8–9 | `lib/features/catalog/data/services/catalog_photo_picker.dart`; `lib/screens/formulario_page.dart`; `test/screens/formulario_page_test.dart` | Permissão Android real negada, alternativas e privacidade |
 | 11 | p.5, saída do Flutter Test | `test/features/catalog_view_model_test.dart`; `test/features/open_library_book_repository_test.dart`; `test/models/item_catalogo_test.dart` | Suíte atual: 25 testes aprovados |
-| 12 | p.5, resultados; p.10, cenários | `test/lista_page_test.dart`; `test/screens/`; `test/widgets/`; `integration_test/catalog_crud_flow_test.dart` | Widget atual aprovado; integração aprovada em execução anterior |
+| 12 | p.5, resultados; p.9–10 | `test/lista_page_test.dart`; `test/screens/`; `test/widgets/`; `integration_test/catalog_crud_flow_test.dart`; `integration_test/driver.dart` | Widget e integração aprovados; quatro capturas CRUD |
 | 13 | p.5 e p.7, artefatos e hashes | `build/app/outputs/flutter-apk/app-release.apk`; `build/app/outputs/bundle/release/app-release.aab`; `android/app/build.gradle.kts` | Hashes/assinatura registrados; instalação ocorreu na revisão anterior |
 
 A matriz localiza as evidências e distingue teste automatizado, captura real e lacuna visual. Ela não atribui nota; a avaliação final cabe à rubrica.
 
-Os diagramas explicam fluxos e responsabilidades do código. O apêndice contém capturas reais do app no emulador para login, cadastro, solicitação de câmera e fallback após a negação real. Loading, erro, cache offline e permissão negada também são cobertos por testes; o estado vazio tem teste widget.
+Os diagramas explicam fluxos e responsabilidades do código. O apêndice contém capturas reais para login, cadastro, criação, leitura, edição, exclusão, solicitação de câmera e fallback após a negação real. Loading, erro e cache offline são comprovados pelos testes; o estado vazio tem teste widget.
 
 ## 7. Release, verificação e fontes
 
@@ -98,7 +98,7 @@ Foram gerados APK e AAB assinados com o keystore de release local. O APK foi ver
 | APK | `build/app/outputs/flutter-apk/app-release.apk` | 55.925.983 bytes | `BE59B756169977BBD488522D99344D91E73271AE31C35BAB28356001DF4404B1` |
 | AAB | `build/app/outputs/bundle/release/app-release.aab` | 56.362.836 bytes | `3E333EC1E7CB99E06272FC80F9E67DFE64321BB14E01DA1C173C96A7E8F55D1F` |
 
-Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Release do app: tag `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. Os testes adicionais estão na tag remota `m2-evidencia-v1.0.1`; este relatório final, incluindo a captura real da negação da câmera e a matriz 13/13, está na tag `m2-evidencia-v1.0.2`. As duas revisões alteraram testes/documentação/evidências, sem mudar o código executável usado para gerar APK/AAB. APK release instalado no emulador com `adb install -r`.
+Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Release do app: tag `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. As tags `m2-evidencia-v1.0.1` e `m2-evidencia-v1.0.2` preservam os testes e as evidências anteriores. A tag final `m2-final-v1.1.1` inclui este relatório, o PDF, o driver de capturas e as quatro telas do fluxo CRUD. A revisão não altera o código executável incluído no APK/AAB. APK release instalado no emulador com `adb install -r`.
 
 ### Decisão técnica, dificuldade e solução
 

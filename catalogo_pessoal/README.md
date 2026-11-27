@@ -40,11 +40,13 @@ npm ci
 npm run test:rules
 ```
 
-O fluxo instrumentado cobre cadastro, criação, edição e exclusão no emulador. HTTP claro fica habilitado somente no manifest debug para alcançar os emuladores locais; o manifest release não permite essa configuração.
+O fluxo instrumentado cobre cadastro, criação, leitura, edição e exclusão no emulador. O driver salva as telas CRUD em `output/evidencias/crud/`. HTTP claro fica habilitado somente no manifest debug para alcançar os emuladores locais; o manifest release não permite essa configuração.
 
 ```sh
-firebase emulators:exec --project demo-catalogo-pessoal --only auth,firestore "flutter test integration_test/catalog_crud_flow_test.dart -d emulator-5554 --dart-define=USE_FIREBASE_EMULATORS=true"
+firebase emulators:exec --project demo-catalogo-pessoal --only auth,firestore "flutter drive --driver=integration_test/driver.dart --target=integration_test/catalog_crud_flow_test.dart -d <DEVICE_ID> --dart-define=USE_FIREBASE_EMULATORS=true"
 ```
+
+Substitua `<DEVICE_ID>` pelo ID exibido por `flutter devices`. O `--dart-define=USE_FIREBASE_EMULATORS=true` é obrigatório para redirecionar Auth e Firestore aos serviços locais; sem essa opção, o app pode conectar ao projeto configurado em `firebase_options.dart`.
 
 `test/` contém testes unitários, de widget e das regras. Os testes de integração exigem dispositivo/emulador Android conectado e os emuladores Firebase ativos.
 
