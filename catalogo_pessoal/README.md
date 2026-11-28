@@ -67,4 +67,4 @@ Sem configuração, os builds usam a chave debug e servem apenas para instalaç�
 
 ## Rastreamento da entrega
 
-Versão do app: `1.0.0+1`. Código avaliado: tag `m2-final-v1.1.1`; revisão final do relatório/teste widget: tag `m2-final-v1.1.2`. Repositório: [olivdmt/Mobile](https://github.com/olivdmt/Mobile), subdiretório `catalogo_pessoal/`. Os hashes de release são informados no relatório final. As credenciais de assinatura ficam fora do Git.
+Versão do app: `1.0.0+1`. Código avaliado: tag `m2-final-v1.1.1`; revisão final do relatório/teste widget: tag `m2-final-v1.1.3`. Repositório: [olivdmt/Mobile](https://github.com/olivdmt/Mobile), subdiretório `catalogo_pessoal/`. Os hashes de release são informados no relatório final. As credenciais de assinatura ficam fora do Git.

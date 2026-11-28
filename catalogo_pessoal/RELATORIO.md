@@ -22,7 +22,7 @@ O apêndice visual contém capturas reais de login, cadastro e das quatro opera�
 - Diretório do aplicativo: `catalogo_pessoal/`
 - Branch publicada: `codex/m2-final-report`
 - Versão do aplicativo avaliada: tag `m2-final-v1.1.1`, commit `9269620c6429a1a6ac1ef7fb98a2e73c988753d5`.
-- Revisão final deste relatório e teste widget adicional: tag de entrega `m2-final-v1.1.2`.
+- Revisão final deste relatório e teste widget adicional: tag de entrega `m2-final-v1.1.3`.
 - Proveniência do release binário: `m2-final-v1.0.0` (`5014c214dbc6f31172fb090abe621b27946f7a55`); a revisão final não altera código executável, conforme comparação entre tags.
 - Versão Flutter: `1.0.0+1`
 - Ambiente validado: Flutter 3.47.0, Dart 3.13.0, JDK Temurin 21.0.13, Gradle 8.14.3, Android Gradle Plugin 8.13.2, Kotlin Gradle Plugin 2.4.0, Android Build Tools 36.0.0, NDK 28.2.13676358 e Node.js/Firebase CLI para emuladores.
@@ -32,7 +32,7 @@ Reprodução a partir da tag:
 ```sh
 git clone https://github.com/olivdmt/Mobile.git
 cd Mobile/catalogo_pessoal
-git checkout m2-final-v1.1.2
+git checkout m2-final-v1.1.3
 flutter pub get
 flutter run
 ```
@@ -99,7 +99,7 @@ Foram gerados APK e AAB assinados com o keystore de release local. O APK foi ver
 | APK | `build/app/outputs/flutter-apk/app-release.apk` | 55.925.983 bytes | `BE59B756169977BBD488522D99344D91E73271AE31C35BAB28356001DF4404B1` |
 | AAB | `build/app/outputs/bundle/release/app-release.aab` | 56.362.836 bytes | `3E333EC1E7CB99E06272FC80F9E67DFE64321BB14E01DA1C173C96A7E8F55D1F` |
 
-Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Os binários foram gerados na tag `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. A comparação entre a tag de release e a avaliação final mostra árvores idênticas para `lib/` (`eee66528a332afa4774242b79ab39d97a0f2900c`) e `android/` (`46fd4c203f8f44dd7a8a74195f4a832944d19cf8`), além do mesmo blob `pubspec.yaml` (`5fe22cda7ae3327e0130835a74aadc8f96b276b0`). Portanto, as mudanças finais em testes, capturas e documentação não alteram o código usado nos binários. A tag de entrega `m2-final-v1.1.2` inclui esta revisão do relatório, PDF, teste widget e os arquivos versionados da integração CRUD.
+Certificado do APK/AAB: `CN=Mateus Dayson de Oliveira`; impressão SHA-256 `098a3717d8aa17a4850d1319bf981e151e062b9a3e49d47ec85099d6e962471b`. Os binários foram gerados na tag `m2-final-v1.0.0`, commit `5014c214dbc6f31172fb090abe621b27946f7a55`. A comparação entre a tag de release e a avaliação final mostra árvores idênticas para `lib/` (`eee66528a332afa4774242b79ab39d97a0f2900c`) e `android/` (`46fd4c203f8f44dd7a8a74195f4a832944d19cf8`), além do mesmo blob `pubspec.yaml` (`5fe22cda7ae3327e0130835a74aadc8f96b276b0`). Portanto, as mudanças finais em testes, capturas e documentação não alteram o código usado nos binários. A tag de entrega `m2-final-v1.1.3` inclui esta revisão do relatório, PDF, teste widget e os arquivos versionados da integração CRUD.
 
 ### Decisão técnica, dificuldade e solução
 
