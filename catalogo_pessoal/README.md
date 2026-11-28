@@ -50,6 +50,12 @@ Substitua `<DEVICE_ID>` pelo ID exibido por `flutter devices`. O `--dart-define=
 
 `test/` contém testes unitários, de widget e das regras. Os testes de integração exigem dispositivo/emulador Android conectado e os emuladores Firebase ativos.
 
+Para reproduzir os estados documentados na página 12 do relatório (cache offline, conversão Open Library simulada e HTTP 503 com retry):
+
+```sh
+flutter test --no-pub test/evidence_states_test.dart
+```
+
 ## Release Android
 
 ```sh
@@ -61,4 +67,4 @@ Sem configuração, os builds usam a chave debug e servem apenas para instalaç�
 
 ## Rastreamento da entrega
 
-Versão do app: `1.0.0+1`. Repositório: [olivdmt/Mobile](https://github.com/olivdmt/Mobile), subdiretório `catalogo_pessoal/`. A versão tagueada e os hashes de release são informados no relatório final. As credenciais de assinatura ficam fora do Git.
+Versão do app: `1.0.0+1`. Código avaliado: tag `m2-final-v1.1.1`; revisão final do relatório/teste widget: tag `m2-final-v1.1.2`. Repositório: [olivdmt/Mobile](https://github.com/olivdmt/Mobile), subdiretório `catalogo_pessoal/`. Os hashes de release são informados no relatório final. As credenciais de assinatura ficam fora do Git.
